@@ -82,6 +82,11 @@ signing {
 }
 
 dependencies {
+    implementation("io.github.hema-webflux:inflector:1.1")
+    // https://mvnrepository.com/artifact/org.springframework/spring-context
+    implementation("org.springframework:spring-context:6.1.9")
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation("org.json:json:20240303")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }

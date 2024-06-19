@@ -1,4 +1,4 @@
-package huabanshou.tiktok.usecase.container;
+package hema.container;
 
 final public class BindingResolutionException extends RuntimeException {
     public BindingResolutionException(String message) {

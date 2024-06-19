@@ -1,4 +1,4 @@
-package huabanshou.tiktok.usecase.container;
+package hema.container;
 
 import hema.web.inflector.Inflector;
 
