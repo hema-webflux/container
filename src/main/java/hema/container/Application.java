@@ -79,10 +79,11 @@ final class Application implements Factory, ContainerAware, Reflector {
     @Override
     public void alias(String abstracted, String alias) {
 
-        if (abstracted.equals(alias)){
-            
+        if (abstracted.equals(alias)) {
+
         }
 
+        this.aliases.put(abstracted, alias);
     }
 
     private String getAlias(String clazz) {
