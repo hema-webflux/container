@@ -29,11 +29,11 @@ public class ContainerTests {
 
     @BeforeAll
     public static void before() {
-        Map<String,Object> address = new HashMap<>();
-        address.put("id",1);
-        address.put("user_id",1);
-        address.put("city","Chengdu");
-        address.put("address","Jinjiang");
+        Map<String, Object> address = new HashMap<>();
+        address.put("id", 1);
+        address.put("user_id", 1);
+        address.put("city", "Chengdu");
+        address.put("address", "Jinjiang");
 
         data.put("id", "1");
         data.put("name", "tom");
@@ -45,9 +45,9 @@ public class ContainerTests {
     @Test
     public void testRegularBeanInstantiation() {
         Factory factory = context.getBean(Factory.class);
-        User user = factory.make(User.class, data);
+        User    user    = factory.make(User.class, data);
         assertNotNull(user);
-
+        System.out.println(user.address());
     }
 
 }
