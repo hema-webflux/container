@@ -87,10 +87,22 @@ dependencies {
     implementation("org.springframework:spring-context:6.1.9")
     // https://mvnrepository.com/artifact/org.json/json
     implementation("org.json:json:20240303")
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.3.0") {
+        exclude("com.vaadin.external.google","android-json")
+    }
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-tasks.test {
-    useJUnitPlatform()
+tasks {
+    withType<Test> {
+        useJUnitPlatform()
+    }
+
+    val args = listOf("-XX:+EnableDynamicAgentLoading", "-Xshare:off", "-Dfile.encoding=UTF-8")
+
+    test {
+        jvmArgs(args)
+    }
 }
