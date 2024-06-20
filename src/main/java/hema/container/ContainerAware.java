@@ -13,6 +13,23 @@ interface ContainerAware {
         throw new BindingResolutionException(String.format("Target [%s] is not instantiable.", concrete));
     }
 
+    default Object castAttributeAsNumber(final Parameter parameter, String value) {
+        try {
+            return switch (parameter.getType().getName()) {
+                case "int", "java.lang.Integer" -> Integer.parseInt(value);
+                case "long", "java.lang.Long" -> Long.parseLong(value);
+                case "float", "java.lang.Float" -> Float.parseFloat(value);
+                case "double", "java.lang.Double" -> Double.parseDouble(value);
+                case "boolean", "java.lang.Boolean" -> Boolean.parseBoolean(value);
+                case "short", "java.lang.Short" -> Short.parseShort(value);
+                case "byte", "java.lang.Byte" -> Byte.parseByte(value);
+                default -> throw new IllegalStateException("Unexpected value: " + parameter.getName());
+            };
+        } catch (NumberFormatException e) {
+            return getDefaultValue(parameter);
+        }
+    }
+
     /**
      * Set Default Value for Built-in Types.
      *

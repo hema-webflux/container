@@ -69,20 +69,19 @@ class Container implements Factory, ContainerAware, Reflector {
 
         Stream<Parameter> stream = Stream.of(dependencies);
         stream.forEach(dependency -> {
+
             Object value = findValue(dependency, datasource);
 
             if (isPrimitive(dependency)) {
-
-                if (isValidSpecialType(value) || isConvertibleToNumber(value)) {
+                if (isValidSpecialType(value)) {
                     value = getDefaultValue(dependency);
+                } else if (isConvertibleToNumber(value)) {
+                    value = castAttributeAsNumber(dependency, (String) value);
                 }
-            }
 
-            if (isDeclaredClass(dependency)) {
+            } else if (isDeclaredClass(dependency)) {
                 value = resolveClass(dependency.getType(), value, datasource);
-            }
-
-            if (dependency.getType().isEnum()) {
+            } else if (dependency.getType().isEnum()) {
                 value = factory.make((Class<? extends Enum<?>>) dependency.getType(), datasource);
             }
 
@@ -130,7 +129,7 @@ class Container implements Factory, ContainerAware, Reflector {
         }
 
         if (isJson(value)) {
-            Map<String, Object> serial = new JSONObject(value).toMap();
+            Map<String, Object> serial = new JSONObject().toMap();
             value = make(clazz, serial);
         } else if (value instanceof Map<?, ?>) {
             value = make(clazz, (Map<String, Object>) value);

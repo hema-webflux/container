@@ -75,12 +75,11 @@ interface Reflector {
      * @return boolean.
      */
     default boolean isConvertibleToNumber(final Object value) {
+        return value instanceof String && match((String) value);
+    }
 
-        if (!(value instanceof String numberValue)) {
-            return false;
-        }
-
-        return numberValue.matches("-?\\d+") || numberValue.matches("-?\\d+(\\.\\d+)?") || numberValue.matches("true|false");
+    private boolean match(String value) {
+        return value.matches("-?\\d+") || value.matches("-?\\d+(\\.\\d+)?") || value.matches("true|false");
     }
 
     default boolean isJson(final Object value) {
