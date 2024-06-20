@@ -21,7 +21,7 @@ public class ContainerConfiguration {
     @Lazy
     public Factory factory() {
         Inflector inflector = app.getBean(Inflector.class);
-        return new Application(app, inflector, new EnumFactory(inflector), new HashMap<>());
+        return new Container(app, inflector, new EnumFactory(inflector), new HashMap<>());
     }
 
 }

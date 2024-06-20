@@ -10,7 +10,7 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.stream.Stream;
 
-final class Application implements Factory, ContainerAware, Reflector {
+class Container implements Factory, ContainerAware, Reflector {
 
     private final ApplicationContext context;
 
@@ -28,12 +28,12 @@ final class Application implements Factory, ContainerAware, Reflector {
             "java.lang.Double",
             "java.lang.Float",
             "java.lang.Character",
-            "java.lang.Boolean",
-            };
+            "java.lang.Boolean"
+    };
 
     private static final String[] specialTypes = {"null", "NULL", "undefined", "NaN", "nil"};
 
-    Application(ApplicationContext context, Inflector inflector, EnumFactory enumFactory, Map<String, String> aliases) {
+    Container(ApplicationContext context, Inflector inflector, EnumFactory enumFactory, Map<String, String> aliases) {
         this.context = context;
         this.inflector = inflector;
         this.factory = enumFactory;
@@ -50,20 +50,16 @@ final class Application implements Factory, ContainerAware, Reflector {
         Constructor<?> constructor = findDefaultConstructor(clazz.getDeclaredConstructors());
 
         if (Objects.isNull(constructor)) {
-            fails("No default constructor found.");
+            throw new BindingResolutionException("No default constructor found.");
         }
 
         List<Object> instances = resolveDependencies(constructor.getParameters(), parameters);
 
-        T concrete = null;
-
         try {
-            concrete = clazz.cast(constructor.newInstance(instances.toArray()));
+            return clazz.cast(constructor.newInstance(instances.toArray()));
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            fails(e.getMessage());
+            throw new BindingResolutionException(e.getMessage());
         }
-
-        return concrete;
     }
 
     @SuppressWarnings("unchecked")
@@ -73,7 +69,7 @@ final class Application implements Factory, ContainerAware, Reflector {
 
         Stream<Parameter> stream = Stream.of(dependencies);
         stream.forEach(dependency -> {
-            Object value = getSourceValue(dependency, datasource);
+            Object value = findValue(dependency, datasource);
 
             if (isPrimitive(dependency)) {
 
@@ -96,15 +92,15 @@ final class Application implements Factory, ContainerAware, Reflector {
         return result;
     }
 
-    private Object getSourceValue(final Parameter parameter, final Map<String, Object> sources) {
-        String alias = getAlias(parameter.getName());
+    private Object findValue(final Parameter parameter, final Map<String, Object> sources) {
+
+        String alias = parameter.getName();
+
+        alias = aliases.getOrDefault(alias, alias);
+
         alias = sources.containsKey(alias) ? alias : inflector.snake(alias, "#");
 
         return sources.get(alias);
-    }
-
-    private String getAlias(String clazz) {
-        return this.aliases.getOrDefault(clazz, clazz);
     }
 
     @SuppressWarnings("unchecked")
@@ -167,10 +163,6 @@ final class Application implements Factory, ContainerAware, Reflector {
         }
 
         this.aliases.put(parameter, alias);
-    }
-
-    private void fails(final String message) throws BindingResolutionException {
-        throw new BindingResolutionException(message);
     }
 
     @Override
