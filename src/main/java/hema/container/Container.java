@@ -129,7 +129,7 @@ class Container implements Factory, ContainerAware, Reflector {
         }
 
         if (isJson(value)) {
-            Map<String, Object> serial = new JSONObject().toMap();
+            Map<String, Object> serial = new JSONObject((String) value).toMap();
             value = make(clazz, serial);
         } else if (value instanceof Map<?, ?>) {
             value = make(clazz, (Map<String, Object>) value);
