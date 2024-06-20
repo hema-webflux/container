@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.stream.Stream;
 
 final class Application implements Factory, ContainerAware, Reflector {
 
@@ -41,44 +42,18 @@ final class Application implements Factory, ContainerAware, Reflector {
 
     @Override
     public <T> T make(final Class<T> clazz, final Map<String, Object> parameters) throws BindingResolutionException {
+        return resolve(clazz, parameters);
+    }
 
-        if (clazz.isInterface()) {
+    private <T> T resolve(Class<T> clazz, final Map<String, Object> parameters) throws BindingResolutionException {
 
-            if (!context.containsBean(clazz.getName())) {
-                notInstantiable(clazz.getName());
-            }
-
-            return clazz.cast(context.getBean(clazz.getName()));
-        }
-
-        if (context.containsBean(clazz.getName())) {
-            Object bean = context.getBean(clazz.getName());
-
-            if (clazz.isInstance(bean)) {
-                return clazz.cast(bean);
-            }
-        }
-
-        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-
-        if (constructors.length == 1) {
-            Constructor<?> constructor = constructors[0];
-
-            return build(clazz, constructor, parameters);
-        }
-
-        Constructor<?> constructor = findDefaultConstructor(constructors);
+        Constructor<?> constructor = findDefaultConstructor(clazz.getDeclaredConstructors());
 
         if (Objects.isNull(constructor)) {
             fails("No default constructor found.");
         }
 
-        return build(clazz, constructor, parameters);
-    }
-
-    private <T> T build(final Class<T> clazz, Constructor<?> constructor, final Map<String, Object> row) throws BindingResolutionException {
-
-        List<Object> instances = resolveDependencies(constructor.getParameters(), row);
+        List<Object> instances = resolveDependencies(constructor.getParameters(), parameters);
 
         T concrete = null;
 
@@ -96,19 +71,13 @@ final class Application implements Factory, ContainerAware, Reflector {
 
         List<Object> result = new LinkedList<>();
 
-        for (Parameter dependency : dependencies) {
-
-            String alias = getAlias(dependency.getName());
-
-            alias = datasource.containsKey(alias) ? alias : inflector.snake(alias, "#");
-
-            Object value = datasource.get(alias);
+        Stream<Parameter> stream = Stream.of(dependencies);
+        stream.forEach(dependency -> {
+            Object value = getSourceValue(dependency, datasource);
 
             if (isPrimitive(dependency)) {
 
-                if (isValidSpecialType(value)) {
-                    value = getDefaultValue(dependency);
-                } else if (isConvertibleToNumber(value)) {
+                if (isValidSpecialType(value) || isConvertibleToNumber(value)) {
                     value = getDefaultValue(dependency);
                 }
             }
@@ -122,9 +91,16 @@ final class Application implements Factory, ContainerAware, Reflector {
             }
 
             result.add(value);
-        }
+        });
 
         return result;
+    }
+
+    private Object getSourceValue(final Parameter parameter, final Map<String, Object> sources) {
+        String alias = getAlias(parameter.getName());
+        alias = sources.containsKey(alias) ? alias : inflector.snake(alias, "#");
+
+        return sources.get(alias);
     }
 
     private String getAlias(String clazz) {
@@ -133,6 +109,30 @@ final class Application implements Factory, ContainerAware, Reflector {
 
     @SuppressWarnings("unchecked")
     private <T> Object resolveClass(final Class<T> clazz, Object value, final Map<String, Object> datasource) throws BindingResolutionException {
+
+        if (clazz.isInstance(value)) {
+            return value;
+        }
+
+        boolean hasBean = context.containsBean(clazz.getName());
+
+        if (clazz.isInterface()) {
+
+            if (!hasBean) {
+                notInstantiable(clazz.getName());
+            }
+
+            return clazz.cast(context.getBean(clazz.getName()));
+        }
+
+        if (hasBean) {
+            Object bean = context.getBean(clazz.getName());
+
+            if (clazz.isInstance(bean)) {
+                return clazz.cast(bean);
+            }
+        }
+
         if (isJson(value)) {
             Map<String, Object> serial = new JSONObject(value).toMap();
             value = make(clazz, serial);

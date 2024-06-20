@@ -53,6 +53,10 @@ interface Reflector {
      */
     default Constructor<?> findDefaultConstructor(final Constructor<?>[] constructors) {
 
+        if (constructors.length == 1) {
+            return constructors[0];
+        }
+
         for (Constructor<?> constructor : constructors) {
             Annotation annotation = constructor.getAnnotation(Autowired.class);
             if (annotation != null) {
