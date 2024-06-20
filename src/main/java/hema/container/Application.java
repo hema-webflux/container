@@ -15,9 +15,9 @@ final class Application implements Factory, ContainerAware, Reflector {
 
     private final Inflector inflector;
 
-    private final EnumFactory enumFactory;
+    private final EnumFactory factory;
 
-    private Map<String, String> aliases;
+    private final Map<String, String> aliases;
 
     private static final String[] standardTypes = {
             "java.lang.String",
@@ -35,7 +35,7 @@ final class Application implements Factory, ContainerAware, Reflector {
     Application(ApplicationContext context, Inflector inflector, EnumFactory enumFactory, Map<String, String> aliases) {
         this.context = context;
         this.inflector = inflector;
-        this.enumFactory = enumFactory;
+        this.factory = enumFactory;
         this.aliases = aliases;
     }
 
@@ -64,7 +64,7 @@ final class Application implements Factory, ContainerAware, Reflector {
         if (constructors.length == 1) {
             Constructor<?> constructor = constructors[0];
 
-            return this.build(clazz, constructor, parameters);
+            return build(clazz, constructor, parameters);
         }
 
         Constructor<?> constructor = findDefaultConstructor(constructors);
@@ -73,26 +73,12 @@ final class Application implements Factory, ContainerAware, Reflector {
             fails("No default constructor found.");
         }
 
-        return this.build(clazz, constructor, parameters);
-    }
-
-    @Override
-    public void alias(String abstracted, String alias) {
-
-        if (abstracted.equals(alias)) {
-
-        }
-
-        this.aliases.put(abstracted, alias);
-    }
-
-    private String getAlias(String clazz) {
-        return this.aliases.getOrDefault(clazz, clazz);
+        return build(clazz, constructor, parameters);
     }
 
     private <T> T build(final Class<T> clazz, Constructor<?> constructor, final Map<String, Object> row) throws BindingResolutionException {
 
-        List<Object> instances = this.resolveDependencies(constructor.getParameters(), row);
+        List<Object> instances = resolveDependencies(constructor.getParameters(), row);
 
         T concrete = null;
 
@@ -105,10 +91,6 @@ final class Application implements Factory, ContainerAware, Reflector {
         return concrete;
     }
 
-    private void fails(final String message) throws BindingResolutionException {
-        throw new BindingResolutionException(message);
-    }
-
     @SuppressWarnings("unchecked")
     private List<Object> resolveDependencies(final Parameter[] dependencies, final Map<String, Object> datasource) {
 
@@ -116,11 +98,11 @@ final class Application implements Factory, ContainerAware, Reflector {
 
         for (Parameter dependency : dependencies) {
 
-            String paramName = datasource.containsKey(dependency.getName())
-                    ? dependency.getName()
-                    : inflector.snake(dependency.getName(), "#");
+            String alias = getAlias(dependency.getName());
 
-            Object value = datasource.get(paramName);
+            alias = datasource.containsKey(alias) ? alias : inflector.snake(alias, "#");
+
+            Object value = datasource.get(alias);
 
             if (isPrimitive(dependency)) {
 
@@ -131,26 +113,36 @@ final class Application implements Factory, ContainerAware, Reflector {
                 }
             }
 
-            if ((isDeclaredClass(dependency) || dependency.getType().isInterface()) && !dependency.getType().isEnum()) {
-
-                if (isJson(value)) {
-                    Map<String, Object> serial = new JSONObject(value).toMap();
-                    value = this.make(dependency.getType(), serial);
-                } else if (value instanceof Map<?, ?>) {
-                    value = this.make(dependency.getType(), (Map<String, Object>) value);
-                } else {
-                    value = this.make(dependency.getType(), datasource);
-                }
+            if (isDeclaredClass(dependency)) {
+                value = resolveClass(dependency.getType(), value, datasource);
             }
 
             if (dependency.getType().isEnum()) {
-                value = this.enumFactory.make((Class<? extends Enum<?>>) dependency.getType(), datasource);
+                value = factory.make((Class<? extends Enum<?>>) dependency.getType(), datasource);
             }
 
             result.add(value);
         }
 
         return result;
+    }
+
+    private String getAlias(String clazz) {
+        return this.aliases.getOrDefault(clazz, clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Object resolveClass(final Class<T> clazz, Object value, final Map<String, Object> datasource) throws BindingResolutionException {
+        if (isJson(value)) {
+            Map<String, Object> serial = new JSONObject(value).toMap();
+            value = make(clazz, serial);
+        } else if (value instanceof Map<?, ?>) {
+            value = make(clazz, (Map<String, Object>) value);
+        } else {
+            value = make(clazz, datasource);
+        }
+
+        return value;
     }
 
     private boolean isValidSpecialType(Object value) {
@@ -165,6 +157,20 @@ final class Application implements Factory, ContainerAware, Reflector {
             }
         }
         return false;
+    }
+
+    @Override
+    public void alias(String parameter, String alias) {
+
+        if (parameter.equals(alias)) {
+            throw new LogicException(String.format("[%s] is aliased to itself.", parameter));
+        }
+
+        this.aliases.put(parameter, alias);
+    }
+
+    private void fails(final String message) throws BindingResolutionException {
+        throw new BindingResolutionException(message);
     }
 
     @Override

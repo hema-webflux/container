@@ -37,6 +37,10 @@ interface Reflector {
      * @return boolean
      */
     default boolean isDeclaredClass(final Parameter parameter) {
+        return (isCustomClass(parameter) || parameter.getType().isInterface()) && !parameter.getType().isEnum();
+    }
+
+    private boolean isCustomClass(final Parameter parameter) {
         return !parameter.getType().isPrimitive() && !parameter.getType().getName().startsWith("java.lang");
     }
 
