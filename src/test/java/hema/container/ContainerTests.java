@@ -2,7 +2,6 @@ package hema.container;
 
 import hema.web.inflector.InflectorConfiguration;
 import org.json.JSONObject;
-import org.json.JSONWriter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,9 @@ public class ContainerTests {
         Factory factory = context.getBean(Factory.class);
         User    user    = factory.make(User.class, data);
         assertNotNull(user);
-        System.out.println(user.address());
+        assertNotNull(user.address());
+        assertEquals(1,user.address().id());
+        assertEquals("Chengdu",user.address().city());
     }
 
 }
