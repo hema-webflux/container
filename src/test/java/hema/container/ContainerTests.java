@@ -58,10 +58,12 @@ public class ContainerTests {
     @Test
     public void testContainerAlias() {
         Factory factory = context.getBean(Factory.class);
-        factory.alias("id", "user_id");
-        factory.alias("status", "toggle");
+        factory.when(User.class)
+                .alias("id", "user_id")
+                .alias("status", "toggle");
+
         User user = factory.make(User.class, data);
-        assertEquals(Status.ENABLED, user.status());
+        assertEquals(Status.DISABLED, user.status());
         assertEquals(22, user.id());
     }
 
