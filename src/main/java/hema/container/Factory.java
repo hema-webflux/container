@@ -17,11 +17,9 @@ public interface Factory {
     <T> T make(Class<T> clazz, Map<String, Object> parameters) throws BindingResolutionException;
 
     /**
-     * Alias a parameter to a different name.
-     *
-     * @param parameter
-     * @param alias
+     * Define a parameter alias binding.
+     * @param concrete
+     * @return Aliasable
      */
-    void alias(String parameter, String alias);
-
+    <T> Aliasable when(Class<T> concrete);
 }

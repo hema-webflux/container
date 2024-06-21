@@ -4,6 +4,7 @@ import hema.web.inflector.Inflector;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 final class EnumFactory {
@@ -14,7 +15,7 @@ final class EnumFactory {
         this.inflector = inflector;
     }
 
-    Enum<?> make(final Class<? extends Enum<?>> clazz, final Map<String, Object> datasource) throws BindingResolutionException {
+    Enum<?> make(final Class<? extends Enum<?>> clazz, final Object scope, final Map<String, Object> datasource) throws BindingResolutionException {
 
         Enum<?>[] constants = clazz.getEnumConstants();
 
@@ -22,7 +23,7 @@ final class EnumFactory {
             fails("The enumeration class [%s] must define members.", clazz);
         }
 
-        String constant = findEnumConstant(clazz, datasource);
+        String constant = Objects.isNull(scope) ? findEnumConstant(clazz, datasource) : (String) scope;
 
         Optional<? extends Enum<?>> first = findFirstEnumConstant(constant, constants);
 

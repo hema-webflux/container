@@ -18,7 +18,7 @@ class Container implements Factory, ContainerAware, Reflector {
 
     private final EnumFactory factory;
 
-    private final Map<String, String> aliases;
+    private final AliasBinding aliasable;
 
     private static final String[] standardTypes = {
             "java.lang.String",
@@ -33,16 +33,21 @@ class Container implements Factory, ContainerAware, Reflector {
 
     private static final String[] specialTypes = {"null", "NULL", "undefined", "NaN", "nil"};
 
-    Container(ApplicationContext context, Inflector inflector, EnumFactory enumFactory, Map<String, String> aliases) {
+    Container(ApplicationContext context, Inflector inflector, EnumFactory enumFactory, AliasBinding aliasBinding) {
         this.context = context;
         this.inflector = inflector;
         this.factory = enumFactory;
-        this.aliases = aliases;
+        this.aliasable = aliasBinding;
     }
 
     @Override
     public <T> T make(final Class<T> clazz, final Map<String, Object> parameters) throws BindingResolutionException {
         return resolve(clazz, parameters);
+    }
+
+    @Override
+    public <T> Aliasable when(Class<T> concrete) {
+        return aliasable.addConcreteBinding(concrete.getName());
     }
 
     private <T> T resolve(Class<T> clazz, final Map<String, Object> parameters) throws BindingResolutionException {
@@ -53,7 +58,7 @@ class Container implements Factory, ContainerAware, Reflector {
             throw new BindingResolutionException("No default constructor found.");
         }
 
-        List<Object> instances = resolveDependencies(constructor.getParameters(), parameters);
+        List<Object> instances = resolveDependencies(clazz.getName(), constructor.getParameters(), parameters);
 
         try {
             return clazz.cast(constructor.newInstance(instances.toArray()));
@@ -63,14 +68,14 @@ class Container implements Factory, ContainerAware, Reflector {
     }
 
     @SuppressWarnings("unchecked")
-    private List<Object> resolveDependencies(final Parameter[] dependencies, final Map<String, Object> datasource) {
+    private List<Object> resolveDependencies(final String concrete, final Parameter[] dependencies, final Map<String, Object> datasource) {
 
         List<Object> result = new LinkedList<>();
 
         Stream<Parameter> stream = Stream.of(dependencies);
         stream.forEach(dependency -> {
 
-            Object value = findValue(dependency, datasource);
+            Object value = findValue(concrete, dependency, datasource);
 
             if (isPrimitive(dependency)) {
                 if (isValidSpecialType(value)) {
@@ -82,7 +87,7 @@ class Container implements Factory, ContainerAware, Reflector {
             } else if (isDeclaredClass(dependency)) {
                 value = resolveClass(dependency.getType(), value, datasource);
             } else if (dependency.getType().isEnum()) {
-                value = factory.make((Class<? extends Enum<?>>) dependency.getType(), datasource);
+                value = factory.make((Class<? extends Enum<?>>) dependency.getType(), value, datasource);
             }
 
             result.add(value);
@@ -91,11 +96,14 @@ class Container implements Factory, ContainerAware, Reflector {
         return result;
     }
 
-    private Object findValue(final Parameter parameter, final Map<String, Object> sources) {
+    private Object findValue(final String concrete, final Parameter parameter, final Map<String, Object> sources) {
 
         String alias = parameter.getName();
 
-        alias = aliases.getOrDefault(alias, alias);
+        if (aliasable.hasAlias(concrete)) {
+            alias = aliasable.getAlias(concrete, parameter.getName());
+            return sources.get(alias);
+        }
 
         alias = sources.containsKey(alias) ? alias : inflector.snake(alias, "#");
 
@@ -152,16 +160,6 @@ class Container implements Factory, ContainerAware, Reflector {
             }
         }
         return false;
-    }
-
-    @Override
-    public void alias(String parameter, String alias) {
-
-        if (parameter.equals(alias)) {
-            throw new LogicException(String.format("[%s] is aliased to itself.", parameter));
-        }
-
-        this.aliases.put(parameter, alias);
     }
 
     @Override
