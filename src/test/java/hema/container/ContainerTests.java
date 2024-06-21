@@ -61,11 +61,8 @@ public class ContainerTests {
         factory.alias("id", "user_id");
         factory.alias("status", "toggle");
         User user = factory.make(User.class, data);
-
         assertEquals(Status.ENABLED, user.status());
         assertEquals(22, user.id());
-        System.out.println(user.status());
-        System.out.println(user.id());
     }
 
 }
