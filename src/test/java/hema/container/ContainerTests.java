@@ -39,6 +39,10 @@ public class ContainerTests {
         data.put("email", "tom@hotmail.com");
         data.put("address", new JSONObject(address).toString());
         data.put("status", "ENABLED");
+
+        // alias
+        data.put("user_id",22);
+        data.put("toggle","DISABLED");
     }
 
     @Test
@@ -47,8 +51,21 @@ public class ContainerTests {
         User    user    = factory.make(User.class, data);
         assertNotNull(user);
         assertNotNull(user.address());
-        assertEquals(1,user.address().id());
-        assertEquals("Chengdu",user.address().city());
+        assertEquals(1, user.address().id());
+        assertEquals("Chengdu", user.address().city());
+    }
+
+    @Test
+    public void testContainerAlias() {
+        Factory factory = context.getBean(Factory.class);
+        factory.alias("id", "user_id");
+        factory.alias("status", "toggle");
+        User user = factory.make(User.class, data);
+
+        assertEquals(Status.ENABLED, user.status());
+        assertEquals(22, user.id());
+        System.out.println(user.status());
+        System.out.println(user.id());
     }
 
 }
