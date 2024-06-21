@@ -102,8 +102,7 @@ class Container implements Factory, ContainerAware, Reflector {
 
         if (aliasable.hasAlias(concrete)) {
             alias = aliasable.getAlias(concrete, parameter.getName());
-
-            return alias.contains("\\.") ? findNestedValue(alias, sources) : sources.get(alias);
+            return alias.contains(".") ? findNestedValue(alias, sources) : sources.get(alias);
         }
 
         alias = sources.containsKey(alias) ? alias : inflector.snake(alias, "#");
@@ -112,7 +111,7 @@ class Container implements Factory, ContainerAware, Reflector {
     }
 
     @SuppressWarnings("unchecked")
-    private Object findNestedValue(String alias, Map<String, Object> datasource) {
+    private Object findNestedValue(final String alias, final Map<String, Object> datasource) {
 
         int dotPlaceholder = alias.indexOf(".");
         if (dotPlaceholder == -1) {

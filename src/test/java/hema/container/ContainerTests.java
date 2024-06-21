@@ -21,6 +21,25 @@ public class ContainerTests {
 
     private static final Map<String, Object> data = new HashMap<>();
 
+    @SuppressWarnings("unchecked")
+    public Object value(String alias, Map<String, Object> datasource) {
+
+        int dotPlaceholder = alias.indexOf(".");
+        if (dotPlaceholder == -1) {
+            return datasource.get(alias);
+        }
+
+        String currentKey    = alias.substring(0, dotPlaceholder);
+        Object current = datasource.get(currentKey);
+
+        if (current instanceof Map<?, ?>) {
+            String remainingKeys = alias.substring(dotPlaceholder + 1);
+            return value(remainingKeys, (Map<String, Object>) current);
+        }
+
+        return current;
+    }
+
     @Test
     public void testFactoryNotNull() {
         assertNotNull(context.getBean(Factory.class));
@@ -41,8 +60,9 @@ public class ContainerTests {
         data.put("status", "ENABLED");
 
         // alias
-        data.put("user_id",22);
-        data.put("toggle","DISABLED");
+        data.put("user_id", 22);
+        data.put("toggle", "DISABLED");
+        data.put("nested",Map.of("user", Map.of("address", Map.of("city", "BeiJin"))));
     }
 
     @Test
@@ -65,6 +85,16 @@ public class ContainerTests {
         User user = factory.make(User.class, data);
         assertEquals(Status.DISABLED, user.status());
         assertEquals(22, user.id());
+    }
+
+    @Test
+    public void testAliasNested() {
+        Factory factory = context.getBean(Factory.class);
+        factory.when(Address.class)
+                .alias("city", "nested.user.address.city");
+
+        User user = factory.make(User.class, data);
+        assertEquals("BeiJin", user.address().city());
     }
 
 }
