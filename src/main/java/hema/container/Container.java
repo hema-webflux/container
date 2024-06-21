@@ -102,12 +102,38 @@ class Container implements Factory, ContainerAware, Reflector {
 
         if (aliasable.hasAlias(concrete)) {
             alias = aliasable.getAlias(concrete, parameter.getName());
-            return sources.get(alias);
+
+            return alias.contains("\\.") ? findNestedValue(alias, sources) : sources.get(alias);
         }
 
         alias = sources.containsKey(alias) ? alias : inflector.snake(alias, "#");
 
         return sources.get(alias);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Object findNestedValue(String alias, Map<String, Object> datasource) {
+
+        int dotPlaceholder = alias.indexOf(".");
+        if (dotPlaceholder == -1) {
+            return datasource.get(alias);
+        }
+
+        String currentKey    = alias.substring(0, dotPlaceholder);
+        String remainingKeys = alias.substring(dotPlaceholder + 1);
+
+        Object current = datasource.get(currentKey);
+
+        if (current instanceof Map<?, ?>) {
+            return findNestedValue(remainingKeys, (Map<String, Object>) current);
+        }
+
+        if (isJson(current)) {
+            Map<String, Object> data = new JSONObject((String) current).toMap();
+            return findNestedValue(remainingKeys, data);
+        }
+
+        return current;
     }
 
     @SuppressWarnings("unchecked")
