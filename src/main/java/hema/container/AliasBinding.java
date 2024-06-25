@@ -1,5 +1,6 @@
 package hema.container;
 
+import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,13 +49,22 @@ class AliasBinding implements Aliasable {
      *
      * @return boolean.
      */
-    boolean hasAlias(final String concrete) {
-        return aliases.containsKey(concrete);
+    @Override
+    public <T> boolean hasAlias(final Class<T> concrete) {
+        return aliases.containsKey(concrete.getName());
     }
 
-    String getAlias(final String concrete, final String parameter) {
-        Map<String, String> aliases = this.aliases.get(concrete);
-        return aliases.getOrDefault(parameter, parameter);
+    /**
+     * Get the aliases bound to constructor parameters.
+     *
+     * @param concrete  Abstract name.
+     * @param parameter Clazz constructor parameter name.
+     *
+     * @return Parameter alias.
+     */
+    public <T> String getAlias(final Class<T> concrete, final Parameter parameter) {
+        Map<String, String> aliases = this.aliases.get(concrete.getName());
+        return aliases.getOrDefault(parameter.getName(), parameter.getName());
     }
 
     /**

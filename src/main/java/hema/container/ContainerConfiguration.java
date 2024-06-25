@@ -21,7 +21,10 @@ public class ContainerConfiguration {
     @Lazy
     public Factory factory() {
         Inflector inflector = app.getBean(Inflector.class);
-        return new Container(app, inflector, new EnumFactory(inflector), (AliasBinding) aliasable());
+        Aliasable aliasable = app.getBean(Aliasable.class);
+
+        return new Container(app, (AliasBinding) aliasable(), new Queryable(aliasable, inflector)
+        );
     }
 
     @Bean("property")
