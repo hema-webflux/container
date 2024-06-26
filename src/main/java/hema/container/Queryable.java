@@ -9,6 +9,7 @@ import java.util.Map;
 final class Queryable implements Resolver {
 
     private final Aliasable aliasable;
+
     private final Inflector inflector;
 
     public Queryable(Aliasable aliasable, Inflector inflector) {
@@ -16,34 +17,55 @@ final class Queryable implements Resolver {
         this.inflector = inflector;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> Object resolve(final Class<T> concrete, final Parameter parameter, final Map<String, Object> data) {
+    public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> data) {
 
-        String alias = aliasable.hasAlias(concrete) ? aliasable.getAlias(concrete, parameter) : parameter.getName();
+        if (aliasable.hasAlias(concrete)) {
+            return getValueForAlias(concrete, parameter, data);
+        }
+
+        System.out.println(guessMapKey(parameter, data));
+        System.out.println(data);
+        System.out.println(aliasable.hasAlias(concrete));
+        return data.get(guessMapKey(parameter, data));
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Object getValueForAlias(Class<T> concrete, Parameter parameter, Map<String, Object> data) {
+
+        String alias = aliasable.getAlias(concrete, parameter);
 
         if (alias.contains(".")) {
             Object aliasValue = findNestedValue(alias, data);
 
-            alias = data.containsKey(alias) ? alias : inflector.snake(alias, "#");
+            Object defaultValue = data.get(guessMapKey(parameter, data));
 
-            Object result = data.get(alias);
-
-            if (isJsonObject(result)) {
-                JSONObject json = new JSONObject((String) result);
+            if (isJsonObject(defaultValue)) {
+                JSONObject json = new JSONObject((String) defaultValue);
                 json.append(alias, aliasValue);
                 return json.toMap();
-            } else if (result instanceof Map<?, ?>) {
-                ((Map<String, Object>) result).put(alias, aliasValue);
-                return result;
+            } else if (defaultValue instanceof Map<?, ?>) {
+                ((Map<String, Object>) defaultValue).put(alias, aliasValue);
+                return defaultValue;
             }
 
             return aliasValue;
         }
 
-        alias = data.containsKey(alias) ? alias : inflector.snake(alias, "#");
+        alias = guessMapKey(parameter, data);
 
         return data.get(alias);
+    }
+
+    private String guessMapKey(Parameter parameter, Map<String, Object> data) {
+
+        if (data.containsKey(parameter.getName())) {
+            return parameter.getName();
+        }
+
+        return data.containsKey(parameter.getName().toLowerCase())
+                ? parameter.getName().toLowerCase()
+                : inflector.snake(parameter.getName(), "#");
     }
 
     /**

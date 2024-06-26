@@ -1,5 +1,7 @@
 package hema.container;
 
+import hema.web.inflector.Inflector;
+
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,10 +10,13 @@ class AliasBinding implements Aliasable {
 
     private final Map<String, Map<String, String>> aliases;
 
+    private final Inflector inflector;
+
     private String concrete = null;
 
-    public AliasBinding(Map<String, Map<String, String>> aliases) {
+    public AliasBinding(Map<String, Map<String, String>> aliases, Inflector inflector) {
         this.aliases = aliases;
+        this.inflector = inflector;
     }
 
     /**
@@ -21,7 +26,7 @@ class AliasBinding implements Aliasable {
      * @param alias     Parameter alias.
      */
     @Override
-    public Aliasable alias(final String parameter, final String alias) {
+    public Aliasable alias(String parameter, String alias) {
         if (parameter.equals(alias)) {
             throw new LogicException(String.format("[%s] is aliased to itself.", parameter));
         }
@@ -50,7 +55,7 @@ class AliasBinding implements Aliasable {
      * @return boolean.
      */
     @Override
-    public <T> boolean hasAlias(final Class<T> concrete) {
+    public <T> boolean hasAlias(Class<T> concrete) {
         return aliases.containsKey(concrete.getName());
     }
 
@@ -62,9 +67,19 @@ class AliasBinding implements Aliasable {
      *
      * @return Parameter alias.
      */
-    public <T> String getAlias(final Class<T> concrete, final Parameter parameter) {
+    public <T> String getAlias(Class<T> concrete, Parameter parameter) {
+
         Map<String, String> aliases = this.aliases.get(concrete.getName());
-        return aliases.getOrDefault(parameter.getName(), parameter.getName());
+
+        if (aliases.containsKey(parameter.getName())) {
+            return aliases.get(parameter.getName());
+        }
+
+        if (aliases.containsKey(concrete.getName().toLowerCase())) {
+            return aliases.get(concrete.getName().toLowerCase());
+        }
+
+        return aliases.get(inflector.snake(concrete.getName(), "#"));
     }
 
     /**

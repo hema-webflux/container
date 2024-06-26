@@ -9,7 +9,7 @@ public interface Aliasable {
      * @param parameter Parameter name.
      * @param alias     Parameter alias.
      */
-    Aliasable alias(final String parameter, final String alias);
+    Aliasable alias(String parameter,String alias);
 
     /**
      * Determines whether aliases are bound to constructor parameters of the given clazz.
@@ -18,7 +18,7 @@ public interface Aliasable {
      *
      * @return boolean
      */
-    <T> boolean hasAlias(final Class<T> concrete);
+    <T> boolean hasAlias( Class<T> concrete);
 
     /**
      * Get the aliases bound to constructor parameters.
@@ -28,5 +28,5 @@ public interface Aliasable {
      *
      * @return Parameter alias.
      */
-    <T> String getAlias(final Class<T> concrete, final Parameter parameter);
+    <T> String getAlias(Class<T> concrete, Parameter parameter);
 }

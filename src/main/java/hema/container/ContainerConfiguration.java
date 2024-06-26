@@ -35,6 +35,6 @@ public class ContainerConfiguration {
     @Bean("property")
     @Lazy
     public Aliasable aliasable() {
-        return new AliasBinding(new HashMap<>());
+        return new AliasBinding(new HashMap<>(), app.getBean(Inflector.class));
     }
 }
