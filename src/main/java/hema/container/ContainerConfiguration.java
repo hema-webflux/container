@@ -19,11 +19,16 @@ public class ContainerConfiguration {
 
     @Bean
     @Lazy
-    public Factory factory() {
+    public Container container() {
         Inflector inflector = app.getBean(Inflector.class);
         Aliasable aliasable = app.getBean(Aliasable.class);
 
-        return new Container(app, (AliasBinding) aliasable(), new Queryable(aliasable, inflector)
+        return new Application(
+                app,
+                (AliasBinding) aliasable,
+                new ResolverFactory(),
+                new Queryable(aliasable, inflector),
+                inflector
         );
     }
 

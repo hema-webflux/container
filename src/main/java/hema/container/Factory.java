@@ -1,25 +1,10 @@
 package hema.container;
 
-import java.util.Map;
+import java.lang.reflect.Parameter;
 
-public interface Factory {
+interface Factory {
 
-    /**
-     * Create instance.
-     *
-     * @param clazz      Resolve class.
-     * @param parameters Datasource: mysql or request data collection.
-     *
-     * @return Clazz instance.
-     *
-     * @throws BindingResolutionException .
-     */
-    <T> T make(Class<T> clazz, Map<String, Object> parameters) throws BindingResolutionException;
+    Resolver make(Parameter parameter);
 
-    /**
-     * Define a parameter alias binding.
-     * @param concrete
-     * @return Aliasable
-     */
-    <T> Aliasable when(Class<T> concrete);
+    void setContainer(Container container);
 }

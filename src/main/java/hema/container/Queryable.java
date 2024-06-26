@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
-final class Queryable implements Reflector {
+final class Queryable implements Resolver {
 
     private final Aliasable aliasable;
     private final Inflector inflector;
@@ -16,22 +16,34 @@ final class Queryable implements Reflector {
         this.inflector = inflector;
     }
 
-    <T> Object value(final Class<T> concrete, final Parameter parameter, final Map<String, Object> data) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> Object resolve(final Class<T> concrete, final Parameter parameter, final Map<String, Object> data) {
 
         String alias = aliasable.hasAlias(concrete) ? aliasable.getAlias(concrete, parameter) : parameter.getName();
 
         if (alias.contains(".")) {
-            return findNestedValue(alias, data);
+            Object aliasValue = findNestedValue(alias, data);
+
+            alias = data.containsKey(alias) ? alias : inflector.snake(alias, "#");
+
+            Object result = data.get(alias);
+
+            if (isJsonObject(result)) {
+                JSONObject json = new JSONObject((String) result);
+                json.append(alias, aliasValue);
+                return json.toMap();
+            } else if (result instanceof Map<?, ?>) {
+                ((Map<String, Object>) result).put(alias, aliasValue);
+                return result;
+            }
+
+            return aliasValue;
         }
 
         alias = data.containsKey(alias) ? alias : inflector.snake(alias, "#");
 
         return data.get(alias);
-    }
-
-    @Override
-    public boolean isStandard(Parameter parameter) {
-        return false;
     }
 
     /**
@@ -59,7 +71,7 @@ final class Queryable implements Reflector {
             return findNestedValue(remainingKeys, (Map<String, Object>) current);
         }
 
-        if (isJson(current)) {
+        if (isJsonObject(current)) {
             return findNestedValue(remainingKeys, new JSONObject((String) current).toMap());
         }
 

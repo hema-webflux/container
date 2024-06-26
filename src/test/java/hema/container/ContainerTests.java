@@ -42,7 +42,7 @@ public class ContainerTests {
 
     @Test
     public void testFactoryNotNull() {
-        assertNotNull(context.getBean(Factory.class));
+        assertNotNull(context.getBean(Container.class));
     }
 
     @BeforeAll
@@ -67,8 +67,8 @@ public class ContainerTests {
 
     @Test
     public void testRegularBeanInstantiation() {
-        Factory factory = context.getBean(Factory.class);
-        User    user    = factory.make(User.class, data);
+        Container factory = context.getBean(Container.class);
+        User      user    = factory.make(User.class, data);
         assertNotNull(user);
         assertNotNull(user.address());
         assertEquals(1, user.address().id());
@@ -77,7 +77,7 @@ public class ContainerTests {
 
     @Test
     public void testContainerAlias() {
-        Factory factory = context.getBean(Factory.class);
+        Container factory = context.getBean(Container.class);
         factory.when(User.class)
                 .alias("id", "user_id")
                 .alias("status", "toggle");
@@ -89,7 +89,7 @@ public class ContainerTests {
 
     @Test
     public void testAliasNested() {
-        Factory factory = context.getBean(Factory.class);
+        Container factory = context.getBean(Container.class);
         factory.when(Address.class)
                 .alias("city", "nested.user.address.city");
 
