@@ -8,10 +8,10 @@ import java.util.Map;
 
 final class Queryable implements Resolver {
 
-    private final Aliasable aliasable;
+    private final Replacer  aliasable;
     private final Inflector inflector;
 
-    public Queryable(Aliasable aliasable, Inflector inflector) {
+    public Queryable(Replacer aliasable, Inflector inflector) {
         this.aliasable = aliasable;
         this.inflector = inflector;
     }
@@ -20,7 +20,7 @@ final class Queryable implements Resolver {
     @Override
     public <T> Object resolve(final Class<T> concrete, final Parameter parameter, final Map<String, Object> data) {
 
-        String alias = aliasable.hasAlias(concrete) ? aliasable.getAlias(concrete, parameter) : parameter.getName();
+        String alias = aliasable.hasReplacerAlias(concrete) ? aliasable.getReplacerAlias(concrete, parameter) : parameter.getName();
 
         if (alias.contains(".")) {
             Object aliasValue = findNestedValue(alias, data);

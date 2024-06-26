@@ -31,7 +31,7 @@ class Application implements Container, Resolver, InitializingBean {
     }
 
     @Override
-    public <T> Aliasable when(Class<T> concrete) {
+    public <T> Replacer when(Class<T> concrete) {
         return aliasable.addConcreteBinding(concrete.getName());
     }
 
