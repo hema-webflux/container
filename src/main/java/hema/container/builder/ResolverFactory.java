@@ -1,11 +1,13 @@
-package hema.container;
+package hema.container.builder;
+
+import hema.container.*;
+import hema.web.inflector.Inflector;
+import org.springframework.context.ApplicationContext;
 
 import java.lang.reflect.Parameter;
 import java.util.Set;
 
-class ResolverFactory implements Factory {
-
-    private Application container;
+record ResolverFactory(ApplicationContext applicationContext) implements Factory<Resolver, Parameter> {
 
     private static final Set<String> standardTypes = Set.of(
             "java.lang.String",
@@ -19,22 +21,23 @@ class ResolverFactory implements Factory {
     );
 
     @Override
-    public Resolver make(Parameter parameter) {
+    public Resolver make(Parameter parameter) throws BindingResolutionException {
 
-        if (isPrimitive(parameter)) {
-            return container::resolvePrimitive;
-        } else if (isDeclaredClass(parameter)) {
-            return container::resolveClass;
+        Resolver resolver = applicationContext.getBean(Query.class);
+
+        if (isDeclaredClass(parameter)) {
+            return new ClassResolver(
+                    applicationContext,
+                    resolver,
+                    applicationContext.getBean(Container.class)
+            );
         } else if (parameter.getType().isEnum()) {
-            return container::resolveEnum;
+            return new EnumResolver(resolver, applicationContext.getBean(Inflector.class));
+        } else if (isPrimitive(parameter)) {
+            return new PrimitiveResolver(resolver);
         }
 
-        throw new RuntimeException();
-    }
-
-    @Override
-    public void setContainer(Container container) {
-        this.container = (Application) container;
+        throw new BindingResolutionException("Cannot resolve " + parameter);
     }
 
     /**

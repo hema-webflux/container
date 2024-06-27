@@ -1,17 +1,6 @@
 package hema.container;
 
-import java.lang.reflect.Parameter;
+public interface Factory<R, P> {
 
-interface Factory {
-
-    /**
-     * Create a new resolver instance.
-     *
-     * @param parameter Reflector parameter object.
-     *
-     * @return Resolver instance.
-     */
-    Resolver make(Parameter parameter);
-
-    void setContainer(Container container);
+    R make(P parameter);
 }

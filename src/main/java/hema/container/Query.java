@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
-final class Query implements Resolver {
+public class Query implements Resolver {
 
     private final Replacer replacer;
 

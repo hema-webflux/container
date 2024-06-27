@@ -19,17 +19,9 @@ public class ContainerConfiguration {
 
     @Bean
     @Lazy
+    @SuppressWarnings("unchecked")
     public Container container() {
-        Inflector inflector = app.getBean(Inflector.class);
-        Replacer  aliasable = app.getBean(Replacer.class);
-
-        return new Application(
-                app,
-                (AliasBinding) aliasable,
-                new ResolverFactory(),
-                new Query(aliasable, inflector),
-                inflector
-        );
+        return new Application((AliasBinding) app.getBean(Replacer.class), app.getBean(Factory.class));
     }
 
     @Bean("property")
