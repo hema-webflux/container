@@ -1,48 +1,43 @@
 package hema.container;
 
-import hema.web.inflector.Inflector;
-
 import java.lang.reflect.Parameter;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-class AliasBinding implements Aliasable {
+class AliasBinding implements Replacer {
 
-    private final Map<String, Map<String, String>> aliases;
-
-    private final Inflector inflector;
+    private final Map<String, Map<String, String>> replacers;
 
     private String concrete = null;
 
-    public AliasBinding(Map<String, Map<String, String>> aliases, Inflector inflector) {
-        this.aliases = aliases;
-        this.inflector = inflector;
+    public AliasBinding(Map<String, Map<String, String>> replacers) {
+        this.replacers = replacers;
     }
 
     /**
      * Alias a parameter to a different name.
      *
      * @param parameter Parameter name.
-     * @param alias     Parameter alias.
+     * @param replacer  Parameter alias.
      */
     @Override
-    public Aliasable alias(String parameter, String alias) {
-        if (parameter.equals(alias)) {
-            throw new LogicException(String.format("[%s] is aliased to itself.", parameter));
+    public Replacer replacer(final String parameter, final String replacer) {
+        if (parameter.equals(replacer)) {
+            throw new LogicException(String.format("[%s] is replacer to itself.", parameter));
         }
 
-        if (!aliases.containsKey(concrete)) {
-            Map<String, String> aliases = new HashMap<>();
-            aliases.put(parameter, alias);
+        if (!replacers.containsKey(concrete)) {
+            Map<String, String> replacers = new ConcurrentHashMap<>();
+            replacers.put(parameter, replacer);
 
-            this.aliases.put(concrete, aliases);
+            this.replacers.put(concrete, replacers);
 
             return this;
         }
 
-        Map<String, String> aliases = this.aliases.get(concrete);
+        Map<String, String> replacers = this.replacers.get(concrete);
 
-        aliases.put(parameter, alias);
+        replacers.put(parameter, replacer);
 
         return this;
     }
@@ -55,31 +50,21 @@ class AliasBinding implements Aliasable {
      * @return boolean.
      */
     @Override
-    public <T> boolean hasAlias(Class<T> concrete) {
-        return aliases.containsKey(concrete.getName());
+    public <T> boolean hasReplacerAlias(final Class<T> concrete) {
+        return replacers.containsKey(concrete.getName());
     }
 
     /**
-     * Get the aliases bound to constructor parameters.
+     * Get the replacers bound to constructor parameters.
      *
      * @param concrete  Abstract name.
      * @param parameter Clazz constructor parameter name.
      *
      * @return Parameter alias.
      */
-    public <T> String getAlias(Class<T> concrete, Parameter parameter) {
-
-        Map<String, String> aliases = this.aliases.get(concrete.getName());
-
-        if (aliases.containsKey(parameter.getName())) {
-            return aliases.get(parameter.getName());
-        }
-
-        if (aliases.containsKey(concrete.getName().toLowerCase())) {
-            return aliases.get(concrete.getName().toLowerCase());
-        }
-
-        return aliases.get(inflector.snake(concrete.getName(), "#"));
+    public <T> String getReplacerAlias(final Class<T> concrete, final Parameter parameter) {
+        Map<String, String> replacers = this.replacers.get(concrete.getName());
+        return replacers.getOrDefault(parameter.getName(), parameter.getName());
     }
 
     /**
@@ -89,7 +74,7 @@ class AliasBinding implements Aliasable {
      *
      * @return Aliasable.
      */
-    Aliasable addConcreteBinding(final String concrete) {
+    Replacer addConcreteBinding(final String concrete) {
         this.concrete = concrete;
         return this;
     }

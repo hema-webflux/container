@@ -25,7 +25,7 @@ public interface Container {
      * @param concrete
      * @return Aliasable
      */
-    <T> Aliasable when(Class<T> concrete);
+    <T> Replacer when(Class<T> concrete);
 
     /**
      * When there are multiple constructors, look for the default constructor with @Autowired annotations.

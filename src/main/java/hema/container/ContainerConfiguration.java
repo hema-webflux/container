@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Configuration
 public class ContainerConfiguration {
@@ -21,7 +22,7 @@ public class ContainerConfiguration {
     @Lazy
     public Container container() {
         Inflector inflector = app.getBean(Inflector.class);
-        Aliasable aliasable = app.getBean(Aliasable.class);
+        Replacer  aliasable = app.getBean(Replacer.class);
 
         return new Application(
                 app,
@@ -34,7 +35,7 @@ public class ContainerConfiguration {
 
     @Bean("property")
     @Lazy
-    public Aliasable aliasable() {
-        return new AliasBinding(new HashMap<>(), app.getBean(Inflector.class));
+    public Replacer aliasable() {
+        return new AliasBinding(new ConcurrentHashMap<>());
     }
 }

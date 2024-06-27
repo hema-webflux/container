@@ -79,8 +79,8 @@ public class ContainerTests {
     public void testContainerAlias() {
         Container factory = context.getBean(Container.class);
         factory.when(User.class)
-                .alias("id", "user_id")
-                .alias("status", "toggle");
+                .replacer("id", "user_id")
+                .replacer("status", "toggle");
 
         User user = factory.make(User.class, data);
         assertEquals(Status.DISABLED, user.status());
@@ -91,7 +91,7 @@ public class ContainerTests {
     public void testAliasNested() {
         Container factory = context.getBean(Container.class);
         factory.when(Address.class)
-                .alias("city", "nested.user.address.city");
+                .replacer("city", "nested.user.address.city");
 
         User user = factory.make(User.class, data);
         assertEquals("BeiJin", user.address().city());
