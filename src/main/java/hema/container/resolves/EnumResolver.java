@@ -25,7 +25,7 @@ class EnumResolver implements Resolver {
     @SuppressWarnings("unchecked")
     public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource) throws BindingResolutionException {
 
-        Class<? extends Enum<?>> enumerable = (Class<? extends Enum<?>>) concrete;
+        Class<? extends Enum<?>> enumerable = (Class<? extends Enum<?>>) parameter.getType();
 
         Enum<?>[] constants = enumerable.getEnumConstants();
 
