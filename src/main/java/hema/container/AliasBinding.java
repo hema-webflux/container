@@ -1,5 +1,7 @@
 package hema.container;
 
+import hema.web.inflector.Inflector;
+
 import java.lang.reflect.Parameter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,10 +10,13 @@ class AliasBinding implements Replacer {
 
     private final Map<String, Map<String, String>> replacers;
 
+    private final Inflector inflector;
+
     private String concrete = null;
 
-    public AliasBinding(Map<String, Map<String, String>> replacers) {
+     AliasBinding(Map<String, Map<String, String>> replacers,Inflector inflector) {
         this.replacers = replacers;
+        this.inflector = inflector;
     }
 
     /**
@@ -64,7 +69,16 @@ class AliasBinding implements Replacer {
      */
     public <T> String getReplacerAlias(final Class<T> concrete, final Parameter parameter) {
         Map<String, String> replacers = this.replacers.get(concrete.getName());
-        return replacers.getOrDefault(parameter.getName(), parameter.getName());
+
+        if (replacers.containsKey(parameter.getName())) {
+            return replacers.get(parameter.getName());
+        }
+
+        if (replacers.containsKey(concrete.getName().toLowerCase())) {
+            return replacers.get(concrete.getName().toLowerCase());
+        }
+
+        return replacers.get(inflector.snake(concrete.getName(), "#"));
     }
 
     /**
