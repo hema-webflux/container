@@ -23,7 +23,7 @@ record ResolverFactory(ApplicationContext applicationContext) implements Factory
     @Override
     public Resolver make(Parameter parameter) throws BindingResolutionException {
 
-        Resolver resolver = applicationContext.getBean(Query.class);
+        Resolver resolver = applicationContext.getBean(Resolver.class);
 
         if (isDeclaredClass(parameter)) {
             return new ClassResolver(

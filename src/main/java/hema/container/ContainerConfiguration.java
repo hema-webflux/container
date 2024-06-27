@@ -2,9 +2,7 @@ package hema.container;
 
 import hema.web.inflector.Inflector;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.*;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,9 +22,17 @@ public class ContainerConfiguration {
         return new Application((AliasBinding) app.getBean(Replacer.class), app.getBean(Factory.class));
     }
 
-    @Bean("property")
+    @Bean
     @Lazy
+    @Scope("prototype")
     public Replacer aliasable() {
         return new AliasBinding(new ConcurrentHashMap<>(), app.getBean(Inflector.class));
+    }
+
+    @Bean
+    @Lazy
+    @Primary
+    public Resolver resolver() {
+        return new Query(app.getBean(Replacer.class), app.getBean(Inflector.class));
     }
 }

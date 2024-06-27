@@ -1,5 +1,6 @@
 package hema.container;
 
+import hema.container.builder.ResolverConfiguration;
 import hema.web.inflector.InflectorConfiguration;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitConfig({ContainerConfiguration.class, InflectorConfiguration.class})
+@SpringJUnitConfig({ContainerConfiguration.class, InflectorConfiguration.class, ResolverConfiguration.class})
 public class ContainerTests {
 
     @Autowired
