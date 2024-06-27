@@ -1,4 +1,4 @@
-package hema.container.builder;
+package hema.container.resolves;
 
 import hema.container.BindingResolutionException;
 import hema.container.Resolver;

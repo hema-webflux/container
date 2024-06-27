@@ -1,8 +1,9 @@
-package hema.container.builder;
+package hema.container.resolves;
 
 import hema.container.BindingResolutionException;
 import hema.container.Container;
 import hema.container.Resolver;
+import org.json.JSONObject;
 import org.springframework.context.ApplicationContext;
 
 import java.lang.reflect.Parameter;
@@ -46,6 +47,10 @@ class ClassResolver implements Resolver {
 
         if (concrete.isInstance(value)) {
             return value;
+        }
+
+        if (isJsonObject(value)) {
+            return new JSONObject((String) value).toMap();
         }
 
         return container.make(concrete, (Map<String, Object>) value);

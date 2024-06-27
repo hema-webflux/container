@@ -1,6 +1,6 @@
 package hema.container;
 
-import hema.container.builder.ResolverConfiguration;
+import hema.container.resolves.ResolverConfiguration;
 import hema.web.inflector.InflectorConfiguration;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;

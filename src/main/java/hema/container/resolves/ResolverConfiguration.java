@@ -1,4 +1,4 @@
-package hema.container.builder;
+package hema.container.resolves;
 
 import hema.container.Factory;
 import hema.container.Resolver;
