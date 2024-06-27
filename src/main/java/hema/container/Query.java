@@ -24,6 +24,8 @@ class Query implements Resolver {
             return getValueForAlias(concrete, parameter, data);
         }
 
+        System.out.println(data.toString());
+
         return data.get(guessParameterQueryName(parameter, data));
     }
 

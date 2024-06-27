@@ -50,10 +50,10 @@ class ClassResolver implements Resolver {
         }
 
         if (isJsonObject(value)) {
-            return new JSONObject((String) value).toMap();
+            value = new JSONObject((String) value).toMap();
         }
 
-        return container.make(concrete, (Map<String, Object>) value);
+        return container.make(parameter.getType(), (Map<String, Object>) value);
     }
 
 }

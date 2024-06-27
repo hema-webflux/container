@@ -23,7 +23,7 @@ class ArrayResolver implements Resolver {
         if (array instanceof String) {
 
             if (isStringArray((String) array)) {
-                return ((String) array).substring(1, ((String) array).length() - 1).split(", ");
+                return ((String) array).substring(1, ((String) array).length() - 1).split(",");
             }
 
             if (!isStringArray((String) array) && isSplit((String) array)) {
@@ -36,7 +36,7 @@ class ArrayResolver implements Resolver {
         }
 
         if (!(array instanceof Object[])) {
-            throw new BindingResolutionException("Cannot resolve array of: " + array);
+            throw new BindingResolutionException("A Array text must begin with '[' ");
         }
 
         return array;
