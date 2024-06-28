@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-class EnumResolver implements Resolver,Facade {
+class EnumResolver implements Resolver {
 
     private final Resolver resolve;
 
@@ -46,11 +46,6 @@ class EnumResolver implements Resolver,Facade {
         }
 
         return first.orElse(null);
-    }
-
-    @Override
-    public String getFacadeAccessor() {
-        return "enum";
     }
 
     /**

@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContext;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
-class ClassResolver implements Resolver,Facade {
+class ClassResolver implements Resolver {
 
     private final ApplicationContext context;
 
@@ -61,11 +61,6 @@ class ClassResolver implements Resolver,Facade {
         }
 
         return container.make(parameter.getType(), (Map<String, Object>) value);
-    }
-
-    @Override
-    public String getFacadeAccessor() {
-        return "clazz";
     }
 
 }

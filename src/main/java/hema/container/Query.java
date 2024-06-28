@@ -57,7 +57,9 @@ class Query implements Resolver {
             return aliasValue;
         }
 
-        return data.get(guessParameterQueryName(parameter, data));
+        return data.containsKey(replacerAlias)
+                ? data.get(replacerAlias)
+                : data.get(guessParameterQueryName(parameter, data));
     }
 
     /**

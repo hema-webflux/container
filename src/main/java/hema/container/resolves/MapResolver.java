@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
-class MapResolver implements Resolver,Facade {
+class MapResolver implements Resolver {
 
     private final Resolver resolver;
 
@@ -30,8 +30,4 @@ class MapResolver implements Resolver,Facade {
         return value;
     }
 
-    @Override
-    public String getFacadeAccessor() {
-        return "map";
-    }
 }

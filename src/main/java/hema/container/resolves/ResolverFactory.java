@@ -36,7 +36,7 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
 
         Resolver query = context.getBean(Resolver.class);
 
-        Facade resolverFacade = null;
+        Resolver resolverFacade = null;
 
         if (parameter.getType().isEnum()) {
             resolverFacade = new EnumResolver(query, context.getBean(Inflector.class));
@@ -53,12 +53,6 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
         if (Objects.isNull(resolverFacade)) {
             throw new ResolveException("Can't resolve " + parameter.getType().getName());
         }
-
-        if (resolvedInstance.containsKey(resolverFacade.getFacadeAccessor())) {
-            return resolvedInstance.get(resolverFacade.getFacadeAccessor());
-        }
-
-        resolvedInstance.put(resolverFacade.getFacadeAccessor(), resolverFacade);
 
         return resolverFacade;
     }

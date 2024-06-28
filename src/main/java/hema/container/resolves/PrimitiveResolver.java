@@ -7,7 +7,7 @@ import java.lang.reflect.Parameter;
 import java.util.Map;
 import java.util.Objects;
 
-class PrimitiveResolver implements Resolver,Facade {
+class PrimitiveResolver implements Resolver {
 
     private final Resolver resolver;
 
@@ -29,11 +29,6 @@ class PrimitiveResolver implements Resolver,Facade {
         }
 
         return value;
-    }
-
-    @Override
-    public String getFacadeAccessor() {
-        return "primitive";
     }
 
     private boolean match(String value) {
