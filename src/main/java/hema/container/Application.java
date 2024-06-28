@@ -36,11 +36,11 @@ class Application implements Container, Resolver {
      * @throws BindingResolutionException -
      */
     @Override
-    public <T> T make(final Class<T> clazz, final Map<String, Object> parameters) throws BindingResolutionException {
+    public <T> T make(Class<T> clazz, Map<String, Object> parameters) throws BindingResolutionException {
         return resolveConstructor(clazz, parameters);
     }
 
-    private <T> T resolveConstructor(Class<T> concrete, final Map<String, Object> parameters) throws BindingResolutionException {
+    private <T> T resolveConstructor(Class<T> concrete, Map<String, Object> parameters) throws BindingResolutionException {
 
         Constructor<?> constructor = findDefaultConstructor(concrete.getDeclaredConstructors());
 
@@ -70,7 +70,7 @@ class Application implements Container, Resolver {
      *
      * @return Constructor or null.
      */
-    private Constructor<?> findDefaultConstructor(final Constructor<?>[] constructors) {
+    private Constructor<?> findDefaultConstructor(Constructor<?>[] constructors) {
 
         if (constructors.length == 1) {
             return constructors[0];
