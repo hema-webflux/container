@@ -13,9 +13,9 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
 
     private final ApplicationContext context;
 
-    private final Map<String, Resolver> resolvedInstance;
+    private final Map<String, Facade> resolvedInstance;
 
-    ResolverFactory(ApplicationContext context, Map<String, Resolver> resolvedInstance) {
+    ResolverFactory(ApplicationContext context, Map<String, Facade> resolvedInstance) {
         this.context = context;
         this.resolvedInstance = resolvedInstance;
     }
@@ -36,31 +36,31 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
 
         Resolver query = context.getBean(Resolver.class);
 
-        Resolver resolver = null;
+        Facade resolverFacade = null;
 
         if (isDeclaredClass(parameter)) {
-            resolver = new ClassResolver(context, query, context.getBean(Container.class), this);
+            resolverFacade = new ClassResolver(context, query, context.getBean(Container.class), this);
         } else if (parameter.getType().isEnum()) {
-            resolver = new EnumResolver(query, context.getBean(Inflector.class));
+            resolverFacade = new EnumResolver(query, context.getBean(Inflector.class));
         } else if (isPrimitive(parameter)) {
-            resolver = new PrimitiveResolver(query);
+            resolverFacade = new PrimitiveResolver(query);
         } else if (parameter.getType().isArray()) {
-            resolver = new ArrayResolver(query);
+            resolverFacade = new ArrayResolver(query);
         } else if (parameter.getType().equals(Map.class)) {
-            resolver = new MapResolver(query);
+            resolverFacade = new MapResolver(query);
         }
 
-        if (Objects.isNull(resolver)) {
+        if (Objects.isNull(resolverFacade)) {
             throw new ResolveException("Can't resolve " + parameter.getType().getName());
         }
 
-        if (resolvedInstance.containsKey(resolver.getFacadeAccessor())) {
-            return resolvedInstance.get(resolver.getFacadeAccessor());
+        if (resolvedInstance.containsKey(resolverFacade.getFacadeAccessor())) {
+            return resolvedInstance.get(resolverFacade.getFacadeAccessor());
         }
 
-        resolvedInstance.put(resolver.getFacadeAccessor(), resolver);
+        resolvedInstance.put(resolverFacade.getFacadeAccessor(), resolverFacade);
 
-        return resolver;
+        return resolverFacade;
     }
 
     /**

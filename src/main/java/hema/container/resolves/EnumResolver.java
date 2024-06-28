@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-class EnumResolver implements Resolver {
+class EnumResolver implements Resolver,Facade {
 
     private final Resolver resolve;
 

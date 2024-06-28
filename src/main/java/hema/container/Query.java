@@ -27,11 +27,6 @@ class Query implements Resolver {
         return data.get(guessParameterQueryName(parameter, data));
     }
 
-    @Override
-    public String getFacadeAccessor() {
-        return "query";
-    }
-
     /**
      * If the replacement alias received contains a dot, it indicates that it points to nested data.
      *

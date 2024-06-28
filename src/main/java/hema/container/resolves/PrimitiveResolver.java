@@ -7,7 +7,7 @@ import java.lang.reflect.Parameter;
 import java.util.Map;
 import java.util.Objects;
 
-class PrimitiveResolver implements Resolver {
+class PrimitiveResolver implements Resolver,Facade {
 
     private final Resolver resolver;
 

@@ -7,7 +7,7 @@ import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.Map;
 
-class ArrayResolver implements Resolver {
+class ArrayResolver implements Resolver,Facade {
 
     private final Resolver resolver;
 

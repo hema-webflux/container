@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContext;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
-class ClassResolver implements Resolver {
+class ClassResolver implements Resolver,Facade {
 
     private final ApplicationContext context;
 

@@ -15,11 +15,4 @@ public interface Resolver extends Aware {
      * @return Any.
      */
     <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource);
-
-    /**
-     * Get the registered name of the component.
-     *
-     * @return string
-     */
-    String getFacadeAccessor();
 }
