@@ -9,16 +9,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 class AliasBinding implements Replacer {
 
-    private final Map<String, Map<String, String>> replacers;
-
     private final Inflector inflector;
 
     private String concrete = null;
 
-    private String replacer = null;
+    private Map<String, Map<String, String>> replacers = null;
 
-    AliasBinding(Map<String, Map<String, String>> replacers, Inflector inflector) {
-        this.replacers = replacers;
+    AliasBinding(Inflector inflector) {
         this.inflector = inflector;
     }
 
@@ -34,9 +31,13 @@ class AliasBinding implements Replacer {
             throw new LogicException(String.format("[%s] is replacer to itself.", parameter));
         }
 
+        if (isNull()) {
+            this.replacers = new ConcurrentHashMap<>();
+        }
+
         if (!replacers.containsKey(concrete)) {
             Map<String, String> replacers = new ConcurrentHashMap<>();
-            replacers.put(parameter, replacer);
+            replacers.put(parameter.trim(), replacer.trim());
 
             this.replacers.put(concrete, replacers);
 
@@ -58,8 +59,25 @@ class AliasBinding implements Replacer {
      * @return boolean.
      */
     @Override
-    public <T> boolean hasReplacerAlias(final Class<T> concrete, Parameter parameter) {
-        return replacers.containsKey(concrete.getName()) && !getReplacerAlias(concrete, parameter).isEmpty();
+    public <T> boolean hasReplacerAlias(Class<T> concrete, Parameter parameter) {
+
+        if (isNull()) {
+            return false;
+        }
+
+        if (replacers.isEmpty()) {
+            return false;
+        }
+
+        if (!replacers.containsKey(concrete.getName())) {
+            return false;
+        }
+
+        return Objects.nonNull(getReplacerAlias(concrete, parameter));
+    }
+
+    private boolean isNull() {
+        return Objects.isNull(replacers);
     }
 
     /**
@@ -72,10 +90,6 @@ class AliasBinding implements Replacer {
      */
     public <T> String getReplacerAlias(final Class<T> concrete, final Parameter parameter) {
 
-        if (Objects.nonNull(this.replacer)) {
-            return this.replacer;
-        }
-
         Map<String, String> replacers = this.replacers.get(concrete.getName());
 
         if (replacers.containsKey(parameter.getName())) {
@@ -86,9 +100,7 @@ class AliasBinding implements Replacer {
             return replacers.get(concrete.getName().toLowerCase());
         }
 
-        this.replacer = replacers.get(inflector.snake(concrete.getName(), "#"));
-
-        return this.replacer;
+        return replacers.get(inflector.snake(concrete.getName(), "#"));
     }
 
     /**

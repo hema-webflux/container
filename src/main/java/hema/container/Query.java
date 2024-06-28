@@ -20,11 +20,9 @@ class Query implements Resolver {
     @Override
     public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> data) {
 
-        if (replacer.hasReplacerAlias(concrete)) {
+        if (replacer.hasReplacerAlias(concrete,parameter)) {
             return getValueForAlias(concrete, parameter, data);
         }
-
-        System.out.println(data.toString());
 
         return data.get(guessParameterQueryName(parameter, data));
     }

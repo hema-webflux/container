@@ -30,7 +30,8 @@ record ResolverFactory(ApplicationContext applicationContext) implements Factory
             return new ClassResolver(
                     applicationContext,
                     resolver,
-                    applicationContext.getBean(Container.class)
+                    applicationContext.getBean(Container.class),
+                    this
             );
         } else if (parameter.getType().isEnum()) {
             return new EnumResolver(resolver, applicationContext.getBean(Inflector.class));
@@ -52,7 +53,7 @@ record ResolverFactory(ApplicationContext applicationContext) implements Factory
      *
      * @return boolean
      */
-    private boolean isDeclaredClass(final Parameter parameter) {
+    boolean isDeclaredClass(final Parameter parameter) {
         return (isCustomClass(parameter) || parameter.getType().isInterface()) && !parameter.getType().isEnum();
     }
 
