@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,25 +22,6 @@ public class ContainerTests {
     private ApplicationContext context;
 
     private static final Map<String, Object> data = new HashMap<>();
-
-    @SuppressWarnings("unchecked")
-    public Object value(String alias, Map<String, Object> datasource) {
-
-        int dotPlaceholder = alias.indexOf(".");
-        if (dotPlaceholder == -1) {
-            return datasource.get(alias);
-        }
-
-        String currentKey    = alias.substring(0, dotPlaceholder);
-        Object current = datasource.get(currentKey);
-
-        if (current instanceof Map<?, ?>) {
-            String remainingKeys = alias.substring(dotPlaceholder + 1);
-            return value(remainingKeys, (Map<String, Object>) current);
-        }
-
-        return current;
-    }
 
     @Test
     public void testFactoryNotNull() {
@@ -59,11 +41,12 @@ public class ContainerTests {
         data.put("email", "tom@hotmail.com");
         data.put("address", new JSONObject(address).toString());
         data.put("status", "ENABLED");
+        data.put("numbers", new Integer[]{1, 2, 3, 4, 5});
 
         // alias
         data.put("user_id", 22);
         data.put("toggle", "DISABLED");
-        data.put("nested",Map.of("user", Map.of("address", Map.of("city", "BeiJin"))));
+        data.put("nested", Map.of("user", Map.of("address", Map.of("city", "BeiJin"))));
     }
 
     @Test
@@ -95,7 +78,17 @@ public class ContainerTests {
                 .replacer("city", "nested.user.address.city");
 
         User user = factory.make(User.class, data);
+        System.out.println(user);
         assertEquals("BeiJin", user.address().city());
+    }
+
+    @Test
+    public void testResolveMap() {
+        Container factory = context.getBean(Container.class);
+
+        Order order = factory.make(Order.class, data);
+        assertEquals(5, order.numbers().length);
+        assertTrue(Set.of(order.numbers()).contains(3));
     }
 
 }
