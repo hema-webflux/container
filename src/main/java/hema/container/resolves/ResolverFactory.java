@@ -13,11 +13,8 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
 
     private final ApplicationContext context;
 
-    private final Map<String, Facade> resolvedInstance;
-
-    ResolverFactory(ApplicationContext context, Map<String, Facade> resolvedInstance) {
+    ResolverFactory(ApplicationContext context) {
         this.context = context;
-        this.resolvedInstance = resolvedInstance;
     }
 
     private static final Set<String> standardTypes = Set.of(

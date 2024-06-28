@@ -24,7 +24,7 @@ public class ResolverConfiguration {
     @Lazy
     @Primary
     public Factory<Resolver, Parameter> factory() {
-        return new ResolverFactory(applicationContext,new ConcurrentHashMap<>());
+        return new ResolverFactory(applicationContext);
     }
 
 }
