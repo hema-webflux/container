@@ -6,9 +6,19 @@ import org.springframework.context.ApplicationContext;
 
 import java.lang.reflect.Parameter;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
-record ResolverFactory(ApplicationContext applicationContext) implements Factory<Resolver, Parameter> {
+class ResolverFactory implements Factory<Resolver, Parameter> {
+
+    private final ApplicationContext context;
+
+    private final Map<String, Resolver> resolvedInstance;
+
+    ResolverFactory(ApplicationContext context, Map<String, Resolver> resolvedInstance) {
+        this.context = context;
+        this.resolvedInstance = resolvedInstance;
+    }
 
     private static final Set<String> standardTypes = Set.of(
             "java.lang.String",
@@ -24,26 +34,33 @@ record ResolverFactory(ApplicationContext applicationContext) implements Factory
     @Override
     public Resolver make(Parameter parameter) throws BindingResolutionException {
 
-        Resolver resolver = applicationContext.getBean(Resolver.class);
+        Resolver query = context.getBean(Resolver.class);
+
+        Resolver resolver = null;
 
         if (isDeclaredClass(parameter)) {
-            return new ClassResolver(
-                    applicationContext,
-                    resolver,
-                    applicationContext.getBean(Container.class),
-                    this
-            );
+            resolver = new ClassResolver(context, query, context.getBean(Container.class), this);
         } else if (parameter.getType().isEnum()) {
-            return new EnumResolver(resolver, applicationContext.getBean(Inflector.class));
+            resolver = new EnumResolver(query, context.getBean(Inflector.class));
         } else if (isPrimitive(parameter)) {
-            return new PrimitiveResolver(resolver);
+            resolver = new PrimitiveResolver(query);
         } else if (parameter.getType().isArray()) {
-            return new ArrayResolver(resolver);
+            resolver = new ArrayResolver(query);
         } else if (parameter.getType().equals(Map.class)) {
-            return new MapResolver(resolver);
+            resolver = new MapResolver(query);
         }
 
-        throw new BindingResolutionException("Cannot resolve " + parameter);
+        if (Objects.isNull(resolver)) {
+            throw new ResolveException("Can't resolve " + parameter.getType().getName());
+        }
+
+        if (resolvedInstance.containsKey(resolver.getFacadeAccessor())) {
+            return resolvedInstance.get(resolver.getFacadeAccessor());
+        }
+
+        resolvedInstance.put(resolver.getFacadeAccessor(), resolver);
+
+        return resolver;
     }
 
     /**

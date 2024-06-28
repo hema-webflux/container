@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 
 import java.lang.reflect.Parameter;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Configuration
 public class ResolverConfiguration {
@@ -23,7 +24,7 @@ public class ResolverConfiguration {
     @Lazy
     @Primary
     public Factory<Resolver, Parameter> factory() {
-        return new ResolverFactory(applicationContext);
+        return new ResolverFactory(applicationContext,new ConcurrentHashMap<>());
     }
 
 }
