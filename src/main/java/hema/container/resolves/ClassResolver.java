@@ -17,10 +17,13 @@ class ClassResolver implements Resolver {
 
     private final Container container;
 
-    ClassResolver(ApplicationContext context, Resolver resolver, Container container) {
+    private final ResolverFactory factory;
+
+    ClassResolver(ApplicationContext context, Resolver resolver, Container container, ResolverFactory factory) {
         this.context = context;
         this.resolver = resolver;
         this.container = container;
+        this.factory = factory;
     }
 
     @Override
@@ -53,7 +56,16 @@ class ClassResolver implements Resolver {
             value = new JSONObject((String) value).toMap();
         }
 
+        if (factory.isDeclaredClass(parameter)) {
+            return container.make(parameter.getType(), datasource);
+        }
+
         return container.make(parameter.getType(), (Map<String, Object>) value);
+    }
+
+    @Override
+    public String getFacadeAccessor() {
+        return "clazz";
     }
 
 }

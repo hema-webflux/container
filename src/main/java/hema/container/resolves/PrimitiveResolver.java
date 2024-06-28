@@ -31,6 +31,11 @@ class PrimitiveResolver implements Resolver {
         return value;
     }
 
+    @Override
+    public String getFacadeAccessor() {
+        return "primitive";
+    }
+
     private boolean match(String value) {
         return value.matches("-?\\d+") || value.matches("-?\\d+(\\.\\d+)?") || value.matches("true|false");
     }

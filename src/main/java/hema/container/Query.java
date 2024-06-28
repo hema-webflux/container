@@ -20,11 +20,16 @@ class Query implements Resolver {
     @Override
     public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> data) {
 
-        if (replacer.hasReplacerAlias(concrete,parameter)) {
+        if (replacer.hasReplacerAlias(concrete, parameter)) {
             return getValueForAlias(concrete, parameter, data);
         }
 
         return data.get(guessParameterQueryName(parameter, data));
+    }
+
+    @Override
+    public String getFacadeAccessor() {
+        return "query";
     }
 
     /**

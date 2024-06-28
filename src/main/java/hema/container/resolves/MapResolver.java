@@ -29,4 +29,9 @@ class MapResolver implements Resolver {
 
         return value;
     }
+
+    @Override
+    public String getFacadeAccessor() {
+        return "map";
+    }
 }

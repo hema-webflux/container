@@ -48,6 +48,11 @@ class EnumResolver implements Resolver {
         return first.orElse(null);
     }
 
+    @Override
+    public String getFacadeAccessor() {
+        return "enum";
+    }
+
     /**
      * If the enumeration value is not found in the data source, retrieve the default enumeration item.
      *

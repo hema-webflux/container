@@ -42,6 +42,11 @@ class ArrayResolver implements Resolver {
         return array;
     }
 
+    @Override
+    public String getFacadeAccessor() {
+        return "array";
+    }
+
     private boolean isStringArray(String value) {
         return (value.startsWith("[") && value.endsWith("]")) || value.matches("^\\\\[.*\\\\]$");
     }
