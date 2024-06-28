@@ -1,9 +1,5 @@
 package hema.container;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.util.Map;
 
 public interface Container {
