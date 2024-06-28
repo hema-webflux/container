@@ -7,18 +7,19 @@ public interface Replacer {
      * Register a custom parameter value replacer.
      *
      * @param parameter Parameter name.
-     * @param replacer     Parameter alias.
+     * @param replacer  Parameter alias.
      */
     Replacer replacer(String parameter, String replacer);
 
     /**
      * Determines whether replacer are bound to constructor parameters of the given clazz.
      *
-     * @param concrete Abstract name.
+     * @param concrete  Abstract name.
+     * @param parameter Constructor parameter object.
      *
      * @return boolean
      */
-    <T> boolean hasReplacerAlias(Class<T> concrete);
+    <T> boolean hasReplacerAlias(Class<T> concrete, Parameter parameter);
 
     /**
      * Get the replacer bound to constructor parameters.
