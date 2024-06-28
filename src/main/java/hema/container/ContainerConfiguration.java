@@ -4,8 +4,6 @@ import hema.web.inflector.Inflector;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 @Configuration
 public class ContainerConfiguration {
 
@@ -24,9 +22,8 @@ public class ContainerConfiguration {
 
     @Bean
     @Lazy
-    @Scope("prototype")
-    public Replacer aliasable() {
-        return new AliasBinding(new ConcurrentHashMap<>(), app.getBean(Inflector.class));
+    public Replacer replacer() {
+        return new AliasBinding(app.getBean(Inflector.class));
     }
 
     @Bean
