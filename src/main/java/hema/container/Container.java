@@ -26,27 +26,4 @@ public interface Container {
      * @return Aliasable
      */
     <T> Replacer when(Class<T> concrete);
-
-    /**
-     * When there are multiple constructors, look for the default constructor with @Autowired annotations.
-     *
-     * @param constructors Reflector constructor collections.
-     *
-     * @return Constructor or null.
-     */
-    default Constructor<?> findDefaultConstructor(final Constructor<?>[] constructors) {
-
-        if (constructors.length == 1) {
-            return constructors[0];
-        }
-
-        for (Constructor<?> constructor : constructors) {
-            Annotation annotation = constructor.getAnnotation(Autowired.class);
-            if (annotation != null) {
-                return constructor;
-            }
-        }
-
-        return null;
-    }
 }

@@ -1,5 +1,8 @@
 package hema.container;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
@@ -58,6 +61,29 @@ class Application implements Container, Resolver {
                  | BindingResolutionException e) {
             throw new BindingResolutionException(e.getMessage());
         }
+    }
+
+    /**
+     * When there are multiple constructors, look for the default constructor with @Autowired annotations.
+     *
+     * @param constructors Reflector constructor collections.
+     *
+     * @return Constructor or null.
+     */
+    private Constructor<?> findDefaultConstructor(final Constructor<?>[] constructors) {
+
+        if (constructors.length == 1) {
+            return constructors[0];
+        }
+
+        for (Constructor<?> constructor : constructors) {
+            Annotation annotation = constructor.getAnnotation(Autowired.class);
+            if (annotation != null) {
+                return constructor;
+            }
+        }
+
+        return null;
     }
 
     @Override

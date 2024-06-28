@@ -38,9 +38,7 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
 
         Facade resolverFacade = null;
 
-        if (isDeclaredClass(parameter)) {
-            resolverFacade = new ClassResolver(context, query, context.getBean(Container.class), this);
-        } else if (parameter.getType().isEnum()) {
+        if (parameter.getType().isEnum()) {
             resolverFacade = new EnumResolver(query, context.getBean(Inflector.class));
         } else if (isPrimitive(parameter)) {
             resolverFacade = new PrimitiveResolver(query);
@@ -48,6 +46,8 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
             resolverFacade = new ArrayResolver(query);
         } else if (parameter.getType().equals(Map.class)) {
             resolverFacade = new MapResolver(query);
+        } else if (isDeclaredClass(parameter)) {
+            resolverFacade = new ClassResolver(context, query, context.getBean(Container.class), this);
         }
 
         if (Objects.isNull(resolverFacade)) {
