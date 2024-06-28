@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +48,8 @@ public class ContainerTests {
         data.put("user_id", 22);
         data.put("toggle", "DISABLED");
         data.put("nested", Map.of("user", Map.of("address", Map.of("city", "BeiJin"))));
+        data.put("user_status", "ENABLED");
+        data.put("order_numbers", "100,50,99,22");
     }
 
     @Test
@@ -83,12 +86,22 @@ public class ContainerTests {
     }
 
     @Test
-    public void testResolveMap() {
+    public void testResolveArray() {
         Container factory = context.getBean(Container.class);
 
         Order order = factory.make(Order.class, data);
         assertEquals(5, order.numbers().length);
         assertTrue(Set.of(order.numbers()).contains(3));
+    }
+
+    @Test
+    public void testResolveArrayForReplacerAlias() {
+        Container factory = context.getBean(Container.class);
+        factory.when(Order.class)
+                .replacer("numbers", "order_numbers");
+
+        Order order = factory.make(Order.class, data);
+        System.out.println(Arrays.toString(order.numbers()));
     }
 
 }

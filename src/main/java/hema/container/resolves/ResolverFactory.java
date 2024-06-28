@@ -37,10 +37,10 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
 
         if (parameter.getType().isEnum()) {
             resolverFacade = new EnumResolver(query, context.getBean(Inflector.class));
-        } else if (isPrimitive(parameter)) {
+        } else if (isPrimitive(parameter.getType())) {
             resolverFacade = new PrimitiveResolver(query);
         } else if (parameter.getType().isArray()) {
-            resolverFacade = new ArrayResolver(query);
+            resolverFacade = new ArrayResolver(query, this);
         } else if (parameter.getType().equals(Map.class)) {
             resolverFacade = new MapResolver(query);
         } else if (isDeclaredClass(parameter)) {
@@ -72,11 +72,11 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
     /**
      * Determines if this Class object represents a primitive type or void.
      *
-     * @param parameter Constructor parameter object.
+     * @param kind Reflect class.
      *
      * @return boolean
      */
-    private boolean isPrimitive(Parameter parameter) {
-        return parameter.getType().isPrimitive() || standardTypes.contains(parameter.getType().getName());
+    boolean isPrimitive(Class<?> kind) {
+        return kind.isPrimitive() || standardTypes.contains(kind.getName());
     }
 }

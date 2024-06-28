@@ -6,13 +6,17 @@ import hema.container.Resolver;
 import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Stream;
 
-class ArrayResolver implements Resolver,Facade {
+class ArrayResolver implements Resolver, Reflector {
 
     private final Resolver resolver;
 
-    public ArrayResolver(Resolver resolver) {
+    private final ResolverFactory resolverFactory;
+
+    public ArrayResolver(Resolver resolver, ResolverFactory resolverFactory) {
         this.resolver = resolver;
+        this.resolverFactory = resolverFactory;
     }
 
     @Override
@@ -27,7 +31,34 @@ class ArrayResolver implements Resolver,Facade {
             }
 
             if (!isStringArray((String) array) && isSplit((String) array)) {
-                return ((String) array).split(",");
+
+                String[] elements = ((String) array).split(",");
+
+                Class<?> kind = parameter.getType().getComponentType();
+
+                if (resolverFactory.isPrimitive(kind)) {
+
+                    return Stream.of(elements).map(element -> {
+
+                        if (isInteger(kind)) {
+                            return Integer.parseInt(element);
+                        } else if (isLong(kind)) {
+                            return Long.parseLong(element);
+                        } else if (isDouble(kind)) {
+                            return Double.parseDouble(element);
+                        } else if (isFloat(kind)) {
+                            return Float.parseFloat(element);
+                        } else if (isShort(kind)) {
+                            return Short.parseShort(element);
+                        } else if (isByte(kind)) {
+                            return Byte.parseByte(element);
+                        }
+
+                        return element;
+                    }).toArray();
+                }
+
+                return elements;
             }
         }
 
@@ -40,11 +71,6 @@ class ArrayResolver implements Resolver,Facade {
         }
 
         return array;
-    }
-
-    @Override
-    public String getFacadeAccessor() {
-        return "array";
     }
 
     private boolean isStringArray(String value) {
