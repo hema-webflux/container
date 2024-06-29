@@ -23,19 +23,24 @@ class ArrayResolver implements Resolver, Caster<Class<?>> {
     @Override
     public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource) {
 
-        Object array = resolver.resolve(concrete, parameter, datasource);
+        Object resolved = resolver.resolve(concrete, parameter, datasource);
 
-        if (array instanceof String) {
+        if (resolved instanceof String) {
 
-            if (isStringArray((String) array)) {
-                return make((String) array);
-            } else if (!isStringArray((String) array) && isSplit((String) array)) {
+            if (isStringArray((String) resolved)) {
+                String stringArray = (String) resolved;
+                return stringArray.substring(1, stringArray.length() - 1).split(",");
+            } else if (!isStringArray((String) resolved) && isSplit((String) resolved)) {
 
                 Class<?> type     = parameter.getType().getComponentType();
-                String[] elements = array.toString().split(",");
+                String[] elements = resolved.toString().split(",");
 
                 if (resolverFactory.isPrimitive(type)) {
-                    return make(type,elements);
+                    Object carry = Array.newInstance(type, elements.length);
+                    IntStream.range(0, elements.length).forEach(index -> {
+                        Array.set(carry, index, castValueToNumber(type, elements[index]));
+                    });
+                    return carry;
                 }
 
                 return elements;
@@ -43,15 +48,15 @@ class ArrayResolver implements Resolver, Caster<Class<?>> {
 
         }
 
-        if (array instanceof Collection<?>) {
-            return ((Collection<?>) array).toArray();
+        if (resolved instanceof Collection<?>) {
+            return ((Collection<?>) resolved).toArray();
         }
 
-        if (!(array instanceof Object[])) {
+        if (!(resolved instanceof Object[])) {
             throw new BindingResolutionException("A Array text must begin with '[' ");
         }
 
-        return array;
+        return resolved;
     }
 
     private boolean isStringArray(String value) {
@@ -60,21 +65,6 @@ class ArrayResolver implements Resolver, Caster<Class<?>> {
 
     private boolean isSplit(String value) {
         return value.contains(",") || value.contains("|");
-    }
-
-    String[] make(String value) {
-        return value.substring(1, value.length() - 1).split(",");
-    }
-
-    Object make(Class<?> clazz,String[] elements) {
-
-        Object carry = Array.newInstance(clazz, elements.length);
-
-        IntStream.range(0, elements.length).forEach(index -> {
-            Array.set(carry, index, castValueToNumber(clazz, elements[index]));
-        });
-
-        return carry;
     }
 
     @Override
