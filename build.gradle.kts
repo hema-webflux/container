@@ -64,14 +64,16 @@ publishing {
         maven {
 
             val isSnapshot = version.toString().endsWith("SNAPSHOT")
-
             val repositories: String = if (isSnapshot) "SNAPSHOT" else "RELEASE"
-
             url = uri(findProperty("NEXUS_${repositories}_URL") as String)
 
             credentials {
-                username = project.ext.get("sonaUsername").toString()
-                password = project.ext.get("sonaPassword").toString()
+                username = project.ext.get("sonaUsername") as String
+                password = project.ext.get("sonaPassword") as String
+            }
+
+            authentication {
+                create<HttpHeaderAuthentication>("header")
             }
         }
     }
@@ -83,13 +85,10 @@ signing {
 
 dependencies {
     implementation("io.github.hema-webflux:inflector:1.1")
-    // https://mvnrepository.com/artifact/org.springframework/spring-context
     implementation("org.springframework:spring-context:6.1.9")
-    // https://mvnrepository.com/artifact/org.json/json
     implementation("org.json:json:20240303")
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.3.0") {
-        exclude("com.vaadin.external.google","android-json")
+        exclude("com.vaadin.external.google", "android-json")
     }
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
