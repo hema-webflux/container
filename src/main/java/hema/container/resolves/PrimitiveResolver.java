@@ -7,7 +7,7 @@ import java.lang.reflect.Parameter;
 import java.util.Map;
 import java.util.Objects;
 
-class PrimitiveResolver implements Resolver {
+class PrimitiveResolver implements Resolver, Caster<Parameter> {
 
     private final Resolver resolver;
 
@@ -35,35 +35,25 @@ class PrimitiveResolver implements Resolver {
         return value.matches("-?\\d+") || value.matches("-?\\d+(\\.\\d+)?") || value.matches("true|false");
     }
 
-    private Object castValueToNumber(final Parameter parameter, String value) throws BindingResolutionException {
-        try {
-            return switch (parameter.getType().getName()) {
-                case "int", "java.lang.Integer" -> Integer.parseInt(value);
-                case "long", "java.lang.Long" -> Long.parseLong(value);
-                case "float", "java.lang.Float" -> Float.parseFloat(value);
-                case "double", "java.lang.Double" -> Double.parseDouble(value);
-                case "boolean", "java.lang.Boolean" -> Boolean.parseBoolean(value);
-                case "short", "java.lang.Short" -> Short.parseShort(value);
-                case "byte", "java.lang.Byte" -> Byte.parseByte(value);
-                default -> new BindingResolutionException(String.format(
-                        "Unresolvable dependency resolving [%s] in class [%s]",
-                        parameter.getName(),
-                        parameter.getClass().getName())
-                );
-            };
-        } catch (NumberFormatException e) {
-            return getDefaultValue(parameter);
-        }
-    }
 
-    private Object getDefaultValue(final Parameter parameter) {
-        return switch (parameter.getType().getName()) {
-            case "int", "java.lang.Integer", "short", "java.lang.Short", "byte", "java.lang.Byte" -> 0;
-            case "long", "java.lang.Long" -> 0L;
-            case "float", "java.lang.Float" -> 0f;
-            case "double", "java.lang.Double" -> 0D;
-            case "boolean", "java.lang.Boolean" -> false;
-            default -> "";
-        };
+    @Override
+    public Object castValueToNumber(Parameter parameter, String value) throws BindingResolutionException {
+
+        Object castValue;
+
+        try {
+            castValue = castValue(parameter.getType(), value);
+        } catch (NumberFormatException e) {
+
+            String message = String.format(
+                    "Unresolvable dependency resolving [%s] in class [%s]",
+                    parameter.getName(),
+                    parameter.getClass().getName()
+            );
+
+            throw new BindingResolutionException(message);
+        }
+
+        return castValue;
     }
 }

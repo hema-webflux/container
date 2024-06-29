@@ -1,4 +1,4 @@
 package hema.container;
 
-record Order(Integer[] numbers) {
+record Order(int[] numbers) {
 }

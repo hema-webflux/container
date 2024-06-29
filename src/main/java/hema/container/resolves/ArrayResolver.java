@@ -3,12 +3,13 @@ package hema.container.resolves;
 import hema.container.BindingResolutionException;
 import hema.container.Resolver;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
-class ArrayResolver implements Resolver, Reflector {
+class ArrayResolver implements Resolver, Caster<Class<?>> {
 
     private final Resolver resolver;
 
@@ -27,39 +28,29 @@ class ArrayResolver implements Resolver, Reflector {
         if (array instanceof String) {
 
             if (isStringArray((String) array)) {
-                return ((String) array).substring(1, ((String) array).length() - 1).split(",");
-            }
+                return make((String) array);
+            } else if (!isStringArray((String) array) && isSplit((String) array)) {
 
-            if (!isStringArray((String) array) && isSplit((String) array)) {
+                Class<?> type     = parameter.getType().getComponentType();
+                String[] elements = array.toString().split(",");
 
-                String[] elements = ((String) array).split(",");
-
-                Class<?> kind = parameter.getType().getComponentType();
-
-                if (resolverFactory.isPrimitive(kind)) {
-
-                    return Stream.of(elements).map(element -> {
-
-                        if (isInteger(kind)) {
-                            return Integer.parseInt(element);
-                        } else if (isLong(kind)) {
-                            return Long.parseLong(element);
-                        } else if (isDouble(kind)) {
-                            return Double.parseDouble(element);
-                        } else if (isFloat(kind)) {
-                            return Float.parseFloat(element);
-                        } else if (isShort(kind)) {
-                            return Short.parseShort(element);
-                        } else if (isByte(kind)) {
-                            return Byte.parseByte(element);
+                if (resolverFactory.isPrimitive(type)) {
+                    return make(new Tuple<>() {
+                        @Override
+                        public Class<?> getLeft() {
+                            return type;
                         }
 
-                        return element;
-                    }).toArray();
+                        @Override
+                        public String[] getRight() {
+                            return elements;
+                        }
+                    });
                 }
 
                 return elements;
             }
+
         }
 
         if (array instanceof Collection<?>) {
@@ -81,4 +72,38 @@ class ArrayResolver implements Resolver, Reflector {
         return value.contains(",") || value.contains("|");
     }
 
+    String[] make(String value) {
+        return value.substring(1, value.length() - 1).split(",");
+    }
+
+    Object make(Tuple<Class<?>, String[]> tuple) {
+
+        Object carry = Array.newInstance(tuple.getLeft(), tuple.getRight().length);
+
+        IntStream.range(0, tuple.getRight().length).forEach(index -> {
+            Array.set(carry, index, castValueToNumber(tuple.getLeft(), tuple.getRight()[index]));
+        });
+
+        return carry;
+    }
+
+    interface Tuple<L, R> {
+        L getLeft();
+
+        R getRight();
+    }
+
+    @Override
+    public Object castValueToNumber(Class<?> clazz, String value) throws BindingResolutionException {
+
+        Object result;
+
+        try {
+            result = castValue(clazz, value);
+        } catch (NumberFormatException e) {
+            throw new BindingResolutionException("Cannot cast " + value + " to " + clazz.getSimpleName());
+        }
+
+        return result;
+    }
 }
