@@ -35,17 +35,7 @@ class ArrayResolver implements Resolver, Caster<Class<?>> {
                 String[] elements = array.toString().split(",");
 
                 if (resolverFactory.isPrimitive(type)) {
-                    return make(new Tuple<>() {
-                        @Override
-                        public Class<?> getLeft() {
-                            return type;
-                        }
-
-                        @Override
-                        public String[] getRight() {
-                            return elements;
-                        }
-                    });
+                    return make(type,elements);
                 }
 
                 return elements;
@@ -76,21 +66,15 @@ class ArrayResolver implements Resolver, Caster<Class<?>> {
         return value.substring(1, value.length() - 1).split(",");
     }
 
-    Object make(Tuple<Class<?>, String[]> tuple) {
+    Object make(Class<?> clazz,String[] elements) {
 
-        Object carry = Array.newInstance(tuple.getLeft(), tuple.getRight().length);
+        Object carry = Array.newInstance(clazz, elements.length);
 
-        IntStream.range(0, tuple.getRight().length).forEach(index -> {
-            Array.set(carry, index, castValueToNumber(tuple.getLeft(), tuple.getRight()[index]));
+        IntStream.range(0, elements.length).forEach(index -> {
+            Array.set(carry, index, castValueToNumber(clazz, elements[index]));
         });
 
         return carry;
-    }
-
-    interface Tuple<L, R> {
-        L getLeft();
-
-        R getRight();
     }
 
     @Override
