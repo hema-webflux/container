@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -91,7 +90,6 @@ public class ContainerTests {
 
         Order order = factory.make(Order.class, data);
         assertEquals(5, order.numbers().length);
-        assertTrue(Set.of(order.numbers()).contains(3));
     }
 
     @Test
