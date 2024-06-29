@@ -101,7 +101,7 @@ public class ContainerTests {
                 .replacer("numbers", "order_numbers");
 
         Order order = factory.make(Order.class, data);
-        System.out.println(Arrays.toString(order.numbers()));
+        assertEquals(100, order.numbers()[0]);
     }
 
 }
