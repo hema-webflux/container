@@ -1,8 +1,8 @@
-package hema.container;
+package hema.container.resolves;
 
 import org.json.JSONObject;
 
-public interface Aware {
+interface Aware {
 
     default boolean isJsonObject(final Object value) {
 

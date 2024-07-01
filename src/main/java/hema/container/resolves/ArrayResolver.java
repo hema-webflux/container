@@ -1,7 +1,6 @@
 package hema.container.resolves;
 
 import hema.container.BindingResolutionException;
-import hema.container.Resolver;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Parameter;

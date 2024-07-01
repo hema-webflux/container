@@ -1,7 +1,6 @@
 package hema.container.resolves;
 
 import hema.container.Factory;
-import hema.container.Resolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +8,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 
 import java.lang.reflect.Parameter;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Configuration
 public class ResolverConfiguration {

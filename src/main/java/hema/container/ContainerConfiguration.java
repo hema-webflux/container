@@ -1,5 +1,6 @@
 package hema.container;
 
+import hema.container.resolves.Resolver;
 import hema.web.inflector.Inflector;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
@@ -17,13 +18,13 @@ public class ContainerConfiguration {
     @Lazy
     @SuppressWarnings("unchecked")
     public Container container() {
-        return new Application((AliasBinding) app.getBean(Replacer.class), app.getBean(Factory.class));
+        return new Application((ReplacerBinding) app.getBean(Replacer.class), app.getBean(Factory.class));
     }
 
     @Bean
     @Lazy
     public Replacer replacer() {
-        return new AliasBinding(app.getBean(Inflector.class));
+        return new ReplacerBinding(app.getBean(Inflector.class));
     }
 
     @Bean

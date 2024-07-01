@@ -1,6 +1,5 @@
 package hema.container.resolves;
 
-import hema.container.Resolver;
 import org.json.JSONObject;
 
 import java.lang.reflect.Parameter;

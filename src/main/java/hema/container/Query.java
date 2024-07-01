@@ -1,5 +1,6 @@
 package hema.container;
 
+import hema.container.resolves.Resolver;
 import hema.web.inflector.Inflector;
 import org.json.JSONObject;
 

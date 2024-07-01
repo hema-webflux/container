@@ -2,7 +2,6 @@ package hema.container.resolves;
 
 import hema.container.BindingResolutionException;
 import hema.container.Container;
-import hema.container.Resolver;
 import org.json.JSONObject;
 import org.springframework.context.ApplicationContext;
 

@@ -1,5 +1,6 @@
 package hema.container;
 
+import hema.container.resolves.Resolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.annotation.Annotation;
@@ -11,11 +12,11 @@ import java.util.stream.Stream;
 
 class Application implements Container, Resolver {
 
-    private final AliasBinding aliasable;
+    private final ReplacerBinding aliasable;
 
     private final Factory<Resolver, Parameter> factory;
 
-    Application(AliasBinding aliasBinding, Factory<Resolver, Parameter> factory) {
+    Application(ReplacerBinding aliasBinding, Factory<Resolver, Parameter> factory) {
         this.aliasable = aliasBinding;
         this.factory = factory;
     }
