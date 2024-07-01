@@ -7,15 +7,18 @@ import org.json.JSONObject;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
-class Query implements Resolver {
+class Contextual implements Resolver {
 
     private final Replacer replacer;
 
     private final Inflector inflector;
 
-    public Query(Replacer replacer, Inflector inflector) {
+    private final Map<String, Map<String, Object>> bindings;
+
+    public Contextual(Replacer replacer, Inflector inflector, Map<String, Map<String, Object>> bindings) {
         this.replacer = replacer;
         this.inflector = inflector;
+        this.bindings = bindings;
     }
 
     @Override
@@ -112,5 +115,9 @@ class Query implements Resolver {
         }
 
         return current;
+    }
+
+    private void flush() {
+        bindings.clear();
     }
 }

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-class ReplacerBinding implements Replacer {
+class ReplacerBindingBuilder implements Replacer {
 
     private final Inflector inflector;
 
@@ -15,7 +15,7 @@ class ReplacerBinding implements Replacer {
 
     private Map<String, Map<String, String>> replacers = null;
 
-    ReplacerBinding(Inflector inflector) {
+    ReplacerBindingBuilder(Inflector inflector) {
         this.inflector = inflector;
     }
 

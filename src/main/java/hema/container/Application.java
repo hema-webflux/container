@@ -12,11 +12,11 @@ import java.util.stream.Stream;
 
 class Application implements Container, Resolver {
 
-    private final ReplacerBinding aliasable;
+    private final ReplacerBindingBuilder aliasable;
 
     private final Factory<Resolver, Parameter> factory;
 
-    Application(ReplacerBinding aliasBinding, Factory<Resolver, Parameter> factory) {
+    Application(ReplacerBindingBuilder aliasBinding, Factory<Resolver, Parameter> factory) {
         this.aliasable = aliasBinding;
         this.factory = factory;
     }
