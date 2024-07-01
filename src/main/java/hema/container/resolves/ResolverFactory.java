@@ -1,6 +1,7 @@
 package hema.container.resolves;
 
 import hema.container.*;
+import hema.container.annotation.Entity;
 import hema.web.inflector.Inflector;
 import org.springframework.context.ApplicationContext;
 
@@ -61,12 +62,8 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
      *
      * @return boolean
      */
-    boolean isDeclaredClass(final Parameter parameter) {
-        return (isCustomClass(parameter) || parameter.getType().isInterface()) && !parameter.getType().isEnum();
-    }
-
-    private boolean isCustomClass(final Parameter parameter) {
-        return !parameter.getType().isPrimitive() && !parameter.getType().getName().startsWith("java.lang");
+    boolean isDeclaredClass(Parameter parameter) {
+        return Objects.nonNull(parameter.getType().getDeclaredAnnotation(Entity.class)) || parameter.getType().isInterface();
     }
 
     /**
