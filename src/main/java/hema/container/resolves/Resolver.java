@@ -14,5 +14,5 @@ public interface Resolver extends Aware {
      *
      * @return Any.
      */
-    <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource);
+    <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource) throws ResolveException;
 }

@@ -14,7 +14,7 @@ class MapResolver implements Resolver {
     }
 
     @Override
-    public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource) {
+    public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource) throws ResolveException {
 
         Object value = resolver.resolve(concrete, parameter, datasource);
 
@@ -23,7 +23,7 @@ class MapResolver implements Resolver {
         }
 
         if (!(value instanceof Map<?, ?>)) {
-            throw new ResolveException("Can't resolve map: " + value);
+            throw new ResolveException(String.format("The [%s] must be a map or json.", value));
         }
 
         return value;

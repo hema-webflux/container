@@ -44,7 +44,7 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
         } else if (parameter.getType().equals(Map.class)) {
             resolverFacade = new MapResolver(query);
         } else if (isDeclaredClass(parameter)) {
-            resolverFacade = new ClassResolver(context, query, context.getBean(Container.class), this);
+            resolverFacade = new ClassResolver(context, context.getBean(Container.class), new MapResolver(query));
         }
 
         if (Objects.isNull(resolverFacade)) {
