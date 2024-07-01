@@ -33,6 +33,12 @@ public class ContainerConfiguration {
     @Lazy
     @Primary
     public Resolver resolver() {
-        return new Contextual(app.getBean(Replacer.class), app.getBean(Inflector.class), new ConcurrentHashMap<>());
+        return new ContextualBindingBuilder(app.getBean(Replacer.class), app.getBean(Inflector.class));
+    }
+
+    @Bean
+    @Lazy
+    public Contextual contextual() {
+        return (Contextual) app.getBean(Resolver.class);
     }
 }
