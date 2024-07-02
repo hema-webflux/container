@@ -99,6 +99,10 @@ tasks {
         useJUnitPlatform()
     }
 
+    withType<JavaCompile> {
+        options.encoding ="UTF-8"
+    }
+
     val args = listOf("-XX:+EnableDynamicAgentLoading", "-Xshare:off", "-Dfile.encoding=UTF-8")
 
     test {
