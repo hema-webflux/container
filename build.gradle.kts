@@ -71,10 +71,6 @@ publishing {
                 username = project.ext.get("sonaUsername") as String
                 password = project.ext.get("sonaPassword") as String
             }
-
-            authentication {
-                create<HttpHeaderAuthentication>("header")
-            }
         }
     }
 }
