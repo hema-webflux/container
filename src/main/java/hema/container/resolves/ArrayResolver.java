@@ -1,6 +1,7 @@
 package hema.container.resolves;
 
 import hema.container.BindingResolutionException;
+import hema.container.Factory;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Parameter;
@@ -14,9 +15,12 @@ class ArrayResolver implements Resolver, Caster<Class<?>> {
 
     private final ResolverFactory resolverFactory;
 
-    public ArrayResolver(Resolver resolver, ResolverFactory resolverFactory) {
+    private final Factory<Object, Tuple<Class<?>, Object[]>> factory;
+
+    public ArrayResolver(Resolver resolver, ResolverFactory resolverFactory, Factory<Object, Tuple<Class<?>, Object[]>> factory) {
         this.resolver = resolver;
         this.resolverFactory = resolverFactory;
+        this.factory = factory;
     }
 
     @Override
@@ -51,8 +55,8 @@ class ArrayResolver implements Resolver, Caster<Class<?>> {
             return ((Collection<?>) resolved).toArray();
         }
 
-        if (!(resolved instanceof Object[])) {
-            throw new BindingResolutionException("A Array text must begin with '[' ");
+        if (canAutoBoxing(parameter.getType().getComponentType(), resolved.getClass().getComponentType())) {
+            System.out.println(Array.getLength(resolved));
         }
 
         return resolved;
@@ -78,5 +82,22 @@ class ArrayResolver implements Resolver, Caster<Class<?>> {
         }
 
         return result;
+    }
+
+    static class genericArrayFactory implements Factory<Object, Tuple<Class<?>, Object[]>> {
+
+        private Caster<Class<?>> caster;
+
+        @Override
+        public Object make(Tuple<Class<?>, Object[]> tuple) {
+            Object carry = Array.newInstance(tuple.left(), tuple.right().length);
+            IntStream.range(0, tuple.right().length)
+                    .forEach(index -> Array.set(carry, index, caster.castValueToNumber(tuple.left(), (String) tuple.right()[index])));
+            return carry;
+        }
+
+        void caster(Caster<Class<?>> caster) {
+            this.caster = caster;
+        }
     }
 }

@@ -30,6 +30,7 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
     );
 
     @Override
+    @SuppressWarnings("unchecked")
     public Resolver make(Parameter parameter) throws BindingResolutionException {
 
         Resolver query = context.getBean(Resolver.class);
@@ -41,7 +42,9 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
         } else if (isPrimitive(parameter.getType())) {
             resolverFacade = new PrimitiveResolver(query);
         } else if (parameter.getType().isArray()) {
-            resolverFacade = new ArrayResolver(query, this);
+            ArrayResolver.genericArrayFactory factory = new ArrayResolver.genericArrayFactory();
+            resolverFacade = new ArrayResolver(query, this, factory);
+            factory.caster((Caster<Class<?>>) resolverFacade);
         } else if (parameter.getType().equals(Map.class)) {
             resolverFacade = new MapResolver(query);
         } else if (isDeclaredClass(parameter)) {

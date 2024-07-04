@@ -9,27 +9,68 @@ interface Caster<T extends AnnotatedElement> {
 
     default Object castValue(Class<?> clazz, String value) throws NumberFormatException {
 
-        if (clazz == int.class || clazz == Integer.class) {
+        if (isInt(clazz)) {
             return Integer.parseInt(value);
-        } else if (clazz == long.class || clazz == Long.class) {
+        } else if (isLong(clazz)) {
             return Long.parseLong(value);
-        } else if (clazz == float.class || clazz == Float.class) {
+        } else if (isFloat(clazz)) {
             return Float.parseFloat(value);
-        } else if (clazz == double.class || clazz == Double.class) {
+        } else if (isDouble(clazz)) {
             return Double.parseDouble(value);
-        } else if (clazz == boolean.class || clazz == Boolean.class) {
+        } else if (isBoolean(clazz)) {
             return Boolean.parseBoolean(value);
-        } else if (clazz == short.class || clazz == Short.class) {
+        } else if (isShort(clazz)) {
             return Short.parseShort(value);
-        } else if (clazz == byte.class || clazz == Byte.class) {
+        } else if (isByte(clazz)) {
             return Byte.parseByte(value);
         }
 
         return value;
     }
 
-    Object castValueToNumber(T clazz, String value) throws BindingResolutionException;
+    default boolean canAutoBoxing(Class<?> parameter, Class<?> resolved) {
+        return (isInt(parameter) || isInt(resolved)) ||
+                (isLong(parameter) || isLong(resolved)) ||
+                (isFloat(parameter) || isFloat(resolved)) ||
+                (isDouble(parameter) || isDouble(resolved)) ||
+                (isShort(parameter) || isShort(resolved)) ||
+                (isBoolean(parameter) || isBoolean(resolved)) ||
+                (isByte(parameter) || isByte(resolved));
+    }
 
+    private boolean isInt(Class<?> kind) {
+        return kind.equals(int.class) || kind.equals(Integer.class);
+    }
+
+    private boolean isLong(Class<?> kind) {
+        return kind.equals(long.class) || kind.equals(Long.class);
+    }
+
+    private boolean isFloat(Class<?> kind) {
+        return kind.equals(float.class) || kind.equals(Float.class);
+    }
+
+    private boolean isDouble(Class<?> kind) {
+        return kind.equals(double.class) || kind.equals(Float.class);
+    }
+
+    private boolean isShort(Class<?> kind) {
+        return kind.equals(short.class) || kind.equals(Short.class);
+    }
+
+    private boolean isBoolean(Class<?> kind) {
+        return kind.equals(boolean.class) || kind.equals(Boolean.class);
+    }
+
+    private boolean isByte(Class<?> kind) {
+        return kind.equals(byte.class) || kind.equals(Byte.class);
+    }
+
+    private boolean isChar(Class<?> kind) {
+        return kind.equals(char.class) || kind.equals(Character.class);
+    }
+
+    Object castValueToNumber(T clazz, String value) throws BindingResolutionException;
 
     default Object getDefaultValue(final Parameter parameter) {
         return switch (parameter.getType().getName()) {
