@@ -27,7 +27,7 @@ class ContextualBindingBuilder implements Contextual {
         }
 
         if (replacer.hasReplacerAlias(concrete, parameter)) {
-            return getValueForAlias(concrete, parameter, sourceData);
+            return getValueForAlias(concrete, parameter, data);
         }
 
         return data.get(guessParameterQueryName(parameter, data));
