@@ -5,11 +5,11 @@ plugins {
 }
 
 val userHome: String = System.getProperty("user.home")
-val signingConfigureFile = findProperty("SIGNING_CONFIGURE_FILE")
+val signingConfigureFile = findProperty("signing.configure.file")
 apply(from = String.format("%s/.gradle/%s", userHome, signingConfigureFile))
 
-group = findProperty("PACKAGE_GROUP") as String
-version = findProperty("PACKAGE_VERSION") as String
+group = findProperty("package.group") as String
+version = findProperty("package.version") as String
 
 repositories {
     mavenCentral()
@@ -32,28 +32,28 @@ publishing {
 
             pom {
                 name = project.name
-                description = property("POM_DESCRIPTION") as String
-                url = findProperty("POM_SCM_URL") as String
+                description = property("pom.description") as String
+                url = findProperty("pom.scm.url") as String
 
                 licenses {
                     license {
-                        name = findProperty("POM_LICENSE_NAME") as String
-                        url = findProperty("POM_LICENSE_URL") as String
+                        name = findProperty("pom.license.name") as String
+                        url = findProperty("pom.license.url") as String
                     }
                 }
 
                 developers {
                     developer {
-                        id = findProperty("POM_DEVELOPER_ID") as String
-                        name = findProperty("POM_DEVELOPER_NAME") as String
-                        email = findProperty("POM_DEVELOPER_EMAIL") as String
+                        id = findProperty("pom.developer.id") as String
+                        name = findProperty("pom.developer.name") as String
+                        email = findProperty("pom.developer.email") as String
                     }
                 }
 
                 scm {
-                    connection = findProperty("POM_SCM_CONNECTION") as String
-                    developerConnection = findProperty("POM_SCM_DEVELOPER_CONNECTION") as String
-                    url = findProperty("POM_SCM_URL") as String
+                    connection = findProperty("pom.scm.connection") as String
+                    developerConnection = findProperty("pom.scm.developer.connection") as String
+                    url = findProperty("pom.scm.url") as String
                 }
 
             }
@@ -63,9 +63,7 @@ publishing {
     repositories {
         maven {
 
-            val isSnapshot = version.toString().endsWith("SNAPSHOT")
-            val repositories: String = if (isSnapshot) "SNAPSHOT" else "RELEASE"
-            url = uri(findProperty("NEXUS_${repositories}_URL") as String)
+            url = uri(findProperty("nexus.release.url") as String)
 
             credentials {
                 username = project.ext.get("sonaUsername") as String
@@ -96,7 +94,7 @@ tasks {
     }
 
     withType<JavaCompile> {
-        options.encoding ="UTF-8"
+        options.encoding = "UTF-8"
     }
 
     val args = listOf("-XX:+EnableDynamicAgentLoading", "-Xshare:off", "-Dfile.encoding=UTF-8")
