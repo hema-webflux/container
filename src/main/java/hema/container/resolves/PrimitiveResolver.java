@@ -6,7 +6,7 @@ import java.lang.reflect.Parameter;
 import java.util.Map;
 import java.util.Objects;
 
-class PrimitiveResolver implements Resolver, Caster<Parameter> {
+class PrimitiveResolver implements Resolver, Caster<Parameter,String> {
 
     private final Resolver resolver;
 

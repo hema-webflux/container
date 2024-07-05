@@ -42,9 +42,7 @@ class ResolverFactory implements Factory<Resolver, Parameter> {
         } else if (isPrimitive(parameter.getType())) {
             resolverFacade = new PrimitiveResolver(query);
         } else if (parameter.getType().isArray()) {
-            ArrayResolver.genericArrayFactory factory = new ArrayResolver.genericArrayFactory();
-            resolverFacade = new ArrayResolver(query, this, factory);
-            factory.caster((Caster<Class<?>>) resolverFacade);
+            resolverFacade = new ArrayResolver(query, this);
         } else if (parameter.getType().equals(Map.class)) {
             resolverFacade = new MapResolver(query);
         } else if (isDeclaredClass(parameter)) {
