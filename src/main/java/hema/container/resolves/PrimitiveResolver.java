@@ -5,10 +5,22 @@ import hema.container.BindingResolutionException;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
-class PrimitiveResolver implements Resolver, Caster<Parameter,String> {
+class PrimitiveResolver implements Resolver, Caster<Parameter, String> {
 
     private final Resolver resolver;
+
+    private static final Set<String> standardTypes = Set.of(
+            "java.lang.String",
+            "java.lang.Integer",
+            "java.lang.Long",
+            "java.lang.Short",
+            "java.lang.Double",
+            "java.lang.Float",
+            "java.lang.Character",
+            "java.lang.Boolean"
+    );
 
     PrimitiveResolver(Resolver resolver) {
         this.resolver = resolver;
@@ -54,5 +66,16 @@ class PrimitiveResolver implements Resolver, Caster<Parameter,String> {
         }
 
         return castValue;
+    }
+
+    /**
+     * Determines if this Class object represents a primitive type or void.
+     *
+     * @param kind Reflect class.
+     *
+     * @return boolean
+     */
+    static boolean isPrimitive(Class<?> kind) {
+        return kind.isPrimitive() || standardTypes.contains(kind.getName());
     }
 }

@@ -6,17 +6,15 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 
 class ArrayResolver implements Resolver, Caster<Class<?>, String> {
 
     private final Resolver resolver;
 
-    private final ResolverFactory resolverFactory;
-
-    public ArrayResolver(Resolver resolver, ResolverFactory resolverFactory) {
+    public ArrayResolver(Resolver resolver) {
         this.resolver = resolver;
-        this.resolverFactory = resolverFactory;
     }
 
     @Override
@@ -31,17 +29,13 @@ class ArrayResolver implements Resolver, Caster<Class<?>, String> {
                 return stringArray.substring(1, stringArray.length() - 1).split(",");
             } else if (!isStringArray((String) resolved) && isSplit((String) resolved)) {
 
-                Class<?> kind     = parameter.getType().getComponentType();
-                String[] elements = resolved.toString().split(",");
+                Class<?> reflect = parameter.getType().getComponentType();
 
-                if (resolverFactory.isPrimitive(kind)) {
-                    Object carry = Array.newInstance(kind, elements.length);
-                    IntStream.range(0, elements.length)
-                            .forEach(index -> Array.set(carry, index, castValue(kind, elements[index])));
-                    return carry;
+                if (PrimitiveResolver.isPrimitive(reflect)) {
+                    return make(reflect, resolved.toString().split(","), (value) -> castValue(reflect, (String) value));
                 }
 
-                return elements;
+                return resolved.toString().split(",");
             }
 
         }
@@ -51,18 +45,22 @@ class ArrayResolver implements Resolver, Caster<Class<?>, String> {
         }
 
         if (canAutoBoxing(parameter, resolved)) {
+            return make(parameter.getType().getComponentType(), (Object[]) resolved, (value) -> value);
+        }
 
-            Class<?> kind     = parameter.getType().getComponentType();
-            Object[] elements = (Object[]) resolved;
-
-            Object carry = Array.newInstance(kind, elements.length);
-            IntStream.range(0, elements.length)
-                    .forEach(index -> Array.set(carry, index, elements[index]));
-            return carry;
+        if (ClassResolver.isDeclaredClass(parameter.getType().getComponentType())) {
 
         }
 
         return resolved;
+    }
+
+    <T> Object make(Class<?> reflect, T[] value, Function<Object, Object> closure) {
+        Object elements = Array.newInstance(reflect, value.length);
+
+        IntStream.range(0, value.length).forEach(i -> Array.set(elements, i, closure.apply(value[i])));
+
+        return elements;
     }
 
     boolean canAutoBoxing(Parameter parameter, Object resolved) {

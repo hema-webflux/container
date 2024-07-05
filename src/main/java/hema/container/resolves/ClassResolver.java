@@ -2,10 +2,12 @@ package hema.container.resolves;
 
 import hema.container.BindingResolutionException;
 import hema.container.Container;
+import hema.container.annotation.Entity;
 import org.springframework.context.ApplicationContext;
 
 import java.lang.reflect.Parameter;
 import java.util.Map;
+import java.util.Objects;
 
 class ClassResolver implements Resolver {
 
@@ -44,6 +46,17 @@ class ClassResolver implements Resolver {
         Object value = resolver.resolve(concrete, parameter, datasource);
 
         return container.make(parameter.getType(), (Map<String, Object>) value);
+    }
+
+    /**
+     * Determines whether a given parameter type is a custom class or not.
+     *
+     * @param clazz Constructor parameter object.
+     *
+     * @return boolean
+     */
+    static boolean isDeclaredClass(Class<?> clazz) {
+        return Objects.nonNull(clazz.getDeclaredAnnotation(Entity.class)) || clazz.isInterface();
     }
 
 }
