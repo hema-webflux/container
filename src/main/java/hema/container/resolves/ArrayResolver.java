@@ -32,7 +32,7 @@ class ArrayResolver implements Resolver, Caster<Class<?>, String> {
                 Class<?> reflect = parameter.getType().getComponentType();
 
                 if (PrimitiveResolver.isPrimitive(reflect)) {
-                    return make(reflect, resolved.toString().split(","), (value) -> castValue(reflect, (String) value));
+                    return createGenericArray(reflect, resolved.toString().split(","), (value) -> castValue(reflect, (String) value));
                 }
 
                 return resolved.toString().split(",");
@@ -44,8 +44,12 @@ class ArrayResolver implements Resolver, Caster<Class<?>, String> {
             return ((Collection<?>) resolved).toArray();
         }
 
+        if (!resolved.getClass().isArray()) {
+            throw new ResolveException(String.format("Value %s is not array.", resolved));
+        }
+
         if (canAutoBoxing(parameter, resolved)) {
-            return make(parameter.getType().getComponentType(), (Object[]) resolved, (value) -> value);
+            return createGenericArray(parameter.getType().getComponentType(), (Object[]) resolved, (value) -> value);
         }
 
         if (ClassResolver.isDeclaredClass(parameter.getType().getComponentType())) {
@@ -55,7 +59,7 @@ class ArrayResolver implements Resolver, Caster<Class<?>, String> {
         return resolved;
     }
 
-    <T> Object make(Class<?> reflect, T[] value, Function<Object, Object> closure) {
+    <T> Object createGenericArray(Class<?> reflect, T[] value, Function<Object, Object> closure) {
         Object elements = Array.newInstance(reflect, value.length);
 
         IntStream.range(0, value.length).forEach(i -> Array.set(elements, i, closure.apply(value[i])));
