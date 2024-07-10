@@ -7,18 +7,18 @@ import org.springframework.context.ApplicationContext;
 import java.lang.reflect.Parameter;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
-class ResolverFactory implements Factory<Resolver, Parameter> {
+public class ResolverFactory implements Function<Parameter, Resolver> {
 
     private final ApplicationContext context;
 
-    ResolverFactory(ApplicationContext context) {
+    public ResolverFactory(ApplicationContext context) {
         this.context = context;
     }
 
     @Override
-    public Resolver make(Parameter parameter) throws BindingResolutionException {
-
+    public Resolver apply(Parameter parameter) {
         Resolver query = context.getBean(Resolver.class);
 
         Resolver resolverFacade = null;

@@ -8,17 +8,18 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
-class Application implements Container, Resolver {
+class Application implements Container {
 
     private final ReplacerBindingBuilder aliasable;
 
-    private final Factory<Resolver, Parameter> factory;
+    private final Function<Parameter, Resolver> builder;
 
-    Application(ReplacerBindingBuilder aliasBinding, Factory<Resolver, Parameter> factory) {
+    public Application(ReplacerBindingBuilder aliasBinding, Function<Parameter, Resolver> builder) {
         this.aliasable = aliasBinding;
-        this.factory = factory;
+        this.builder = builder;
     }
 
     @Override
@@ -29,7 +30,7 @@ class Application implements Container, Resolver {
     /**
      * Resolve the give type from the container.
      *
-     * @param clazz      Resolve class.
+     * @param reflect    Resolve class.
      * @param parameters Datasource: mysql or request data collection.
      *
      * @return Object
@@ -37,13 +38,14 @@ class Application implements Container, Resolver {
      * @throws BindingResolutionException -
      */
     @Override
-    public <T> T make(Class<T> clazz, Map<String, Object> parameters) throws BindingResolutionException {
-        return resolveConstructor(clazz, parameters);
+    public <T> T make(Class<T> reflect, Map<String, Object> parameters) throws BindingResolutionException {
+
+        Constructor<?> constructor = resolveDefaultConstructor(reflect.getDeclaredConstructors());
+
+        return build(reflect, parameters, constructor);
     }
 
-    private <T> T resolveConstructor(Class<T> concrete, Map<String, Object> parameters) throws BindingResolutionException {
-
-        Constructor<?> constructor = findDefaultConstructor(concrete.getDeclaredConstructors());
+    private <T> T build(Class<T> reflect, Map<String, Object> parameters, Constructor<?> constructor) throws BindingResolutionException {
 
         if (Objects.isNull(constructor)) {
             throw new BindingResolutionException("No default constructor found.");
@@ -52,10 +54,10 @@ class Application implements Container, Resolver {
         try {
 
             List<Object> instances = Stream.of(constructor.getParameters())
-                    .map(dependency -> resolve(concrete, dependency, parameters))
+                    .map(dependency -> builder.apply(dependency).resolve(reflect, dependency, parameters))
                     .toList();
 
-            return concrete.cast(constructor.newInstance(instances.toArray()));
+            return reflect.cast(constructor.newInstance(instances.toArray()));
         } catch (InvocationTargetException
                  | InstantiationException
                  | IllegalAccessException
@@ -71,7 +73,7 @@ class Application implements Container, Resolver {
      *
      * @return Constructor or null.
      */
-    private Constructor<?> findDefaultConstructor(Constructor<?>[] constructors) {
+    private Constructor<?> resolveDefaultConstructor(Constructor<?>[] constructors) {
 
         if (constructors.length == 1) {
             return constructors[0];
@@ -85,10 +87,5 @@ class Application implements Container, Resolver {
         }
 
         return null;
-    }
-
-    @Override
-    public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource) throws BindingResolutionException {
-        return factory.make(parameter).resolve(concrete, parameter, datasource);
     }
 }

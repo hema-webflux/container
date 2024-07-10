@@ -47,6 +47,7 @@ class ArrayResolver implements Resolver, Caster<Class<?>, String> {
         if (!resolved.getClass().isArray()) {
             throw new ResolveException(String.format("Value %s is not array.", resolved));
         }
+        System.out.println(parameter.getType().getComponentType());
 
         if (canAutoBoxing(parameter, resolved)) {
             return createGenericArray(parameter.getType().getComponentType(), (Object[]) resolved, (value) -> value);

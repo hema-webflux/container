@@ -1,11 +1,10 @@
 package hema.container;
 
 import hema.container.resolves.Resolver;
+import hema.container.resolves.ResolverFactory;
 import hema.web.inflector.Inflector;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 @Configuration
 public class ContainerConfiguration {
@@ -18,9 +17,8 @@ public class ContainerConfiguration {
 
     @Bean
     @Lazy
-    @SuppressWarnings("unchecked")
     public Container container() {
-        return new Application((ReplacerBindingBuilder) app.getBean(Replacer.class), app.getBean(Factory.class));
+        return new Application((ReplacerBindingBuilder) app.getBean(Replacer.class), new ResolverFactory(app));
     }
 
     @Bean
