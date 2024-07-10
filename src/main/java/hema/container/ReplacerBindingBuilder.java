@@ -110,7 +110,7 @@ class ReplacerBindingBuilder implements Replacer {
      *
      * @return Aliasable.
      */
-    Replacer addConcreteBinding(final String concrete) {
+    Replacer addConcreteBinding(String concrete) {
         this.concrete = concrete;
         return this;
     }
