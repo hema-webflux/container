@@ -83,7 +83,7 @@ class ContextualBindingBuilder implements Contextual {
      * @return Last value.
      */
     @SuppressWarnings("unchecked")
-    private Object findNestedValue(final String alias, final Map<String, Object> datasource) {
+    private Object findNestedValue(String alias, Map<String, Object> datasource) {
 
         int dotPlaceholder = alias.indexOf(".");
         if (dotPlaceholder == -1) {
