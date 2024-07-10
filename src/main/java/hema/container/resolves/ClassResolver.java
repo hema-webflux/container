@@ -25,25 +25,25 @@ class ClassResolver implements Resolver {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource) throws BindingResolutionException {
-        if (concrete.isInterface()) {
+    public <T> Object resolve(Class<T> reflect, Parameter parameter, Map<String, Object> datasource) throws BindingResolutionException {
+        if (reflect.isInterface()) {
 
-            if (!context.containsBean(concrete.getName())) {
-                throw new BindingResolutionException(String.format("Target [%s] is not instantiable.", concrete.getName()));
+            if (!context.containsBean(reflect.getName())) {
+                throw new BindingResolutionException(String.format("Target [%s] is not instantiable.", reflect.getName()));
             }
 
-            return concrete.cast(context.getBean(concrete.getName()));
+            return reflect.cast(context.getBean(reflect.getName()));
         }
 
-        if (context.containsBean(concrete.getName())) {
-            Object bean = context.getBean(concrete.getName());
+        if (context.containsBean(reflect.getName())) {
+            Object bean = context.getBean(reflect.getName());
 
-            if (concrete.isInstance(bean)) {
-                return concrete.cast(bean);
+            if (reflect.isInstance(bean)) {
+                return reflect.cast(bean);
             }
         }
 
-        Object value = resolver.resolve(concrete, parameter, datasource);
+        Object value = resolver.resolve(reflect, parameter, datasource);
 
         return container.make(parameter.getType(), (Map<String, Object>) value);
     }

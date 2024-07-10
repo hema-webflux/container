@@ -54,12 +54,12 @@ class ReplacerBindingBuilder implements Replacer {
     /**
      * Determines whether the alias container is bound to the object.
      *
-     * @param concrete .
+     * @param reflect .
      *
      * @return boolean.
      */
     @Override
-    public <T> boolean hasReplacerAlias(Class<T> concrete, Parameter parameter) {
+    public <T> boolean hasReplacerAlias(Class<T> reflect, Parameter parameter) {
 
         if (isNull()) {
             return false;
@@ -69,11 +69,11 @@ class ReplacerBindingBuilder implements Replacer {
             return false;
         }
 
-        if (!replacers.containsKey(concrete.getName())) {
+        if (!replacers.containsKey(reflect.getName())) {
             return false;
         }
 
-        return Objects.nonNull(getReplacerAlias(concrete, parameter));
+        return Objects.nonNull(getReplacerAlias(reflect, parameter));
     }
 
     private boolean isNull() {
@@ -83,24 +83,24 @@ class ReplacerBindingBuilder implements Replacer {
     /**
      * Get the replacers bound to constructor parameters.
      *
-     * @param concrete  Abstract name.
+     * @param reflect  Abstract name.
      * @param parameter Clazz constructor parameter name.
      *
      * @return Parameter alias.
      */
-    public <T> String getReplacerAlias(final Class<T> concrete, final Parameter parameter) {
+    public <T> String getReplacerAlias(final Class<T> reflect, final Parameter parameter) {
 
-        Map<String, String> replacers = this.replacers.get(concrete.getName());
+        Map<String, String> replacers = this.replacers.get(reflect.getName());
 
         if (replacers.containsKey(parameter.getName())) {
             return replacers.get(parameter.getName());
         }
 
-        if (replacers.containsKey(concrete.getName().toLowerCase())) {
-            return replacers.get(concrete.getName().toLowerCase());
+        if (replacers.containsKey(reflect.getName().toLowerCase())) {
+            return replacers.get(reflect.getName().toLowerCase());
         }
 
-        return replacers.get(inflector.snake(concrete.getName(), "#"));
+        return replacers.get(inflector.snake(reflect.getName(), "#"));
     }
 
     /**

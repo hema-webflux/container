@@ -7,59 +7,59 @@ import java.lang.reflect.Parameter;
 
 interface Caster<T extends AnnotatedElement, P> {
 
-    Object castValueToNumber(T kind, P value) throws BindingResolutionException;
+    Object castValueToNumber(T reflect, P value) throws BindingResolutionException;
 
-    default Object castValue(Class<?> clazz, String value) throws NumberFormatException {
+    default Object castValue(Class<?> reflect, String value) throws NumberFormatException {
 
-        if (isInt(clazz)) {
+        if (isInt(reflect)) {
             return Integer.parseInt(value);
-        } else if (isLong(clazz)) {
+        } else if (isLong(reflect)) {
             return Long.parseLong(value);
-        } else if (isFloat(clazz)) {
+        } else if (isFloat(reflect)) {
             return Float.parseFloat(value);
-        } else if (isDouble(clazz)) {
+        } else if (isDouble(reflect)) {
             return Double.parseDouble(value);
-        } else if (isBoolean(clazz)) {
+        } else if (isBoolean(reflect)) {
             return Boolean.parseBoolean(value);
-        } else if (isShort(clazz)) {
+        } else if (isShort(reflect)) {
             return Short.parseShort(value);
-        } else if (isByte(clazz)) {
+        } else if (isByte(reflect)) {
             return Byte.parseByte(value);
         }
 
         return value;
     }
 
-    default boolean isInt(Class<?> kind) {
-        return kind.equals(int.class) || kind.equals(Integer.class);
+    default boolean isInt(Class<?> reflect) {
+        return reflect.equals(int.class) || reflect.equals(Integer.class);
     }
 
-    default boolean isLong(Class<?> kind) {
-        return kind.equals(long.class) || kind.equals(Long.class);
+    default boolean isLong(Class<?> reflect) {
+        return reflect.equals(long.class) || reflect.equals(Long.class);
     }
 
-    default boolean isFloat(Class<?> kind) {
-        return kind.equals(float.class) || kind.equals(Float.class);
+    default boolean isFloat(Class<?> reflect) {
+        return reflect.equals(float.class) || reflect.equals(Float.class);
     }
 
-    default boolean isDouble(Class<?> kind) {
-        return kind.equals(double.class) || kind.equals(Float.class);
+    default boolean isDouble(Class<?> reflect) {
+        return reflect.equals(double.class) || reflect.equals(Float.class);
     }
 
-    default boolean isShort(Class<?> kind) {
-        return kind.equals(short.class) || kind.equals(Short.class);
+    default boolean isShort(Class<?> reflect) {
+        return reflect.equals(short.class) || reflect.equals(Short.class);
     }
 
-    default boolean isBoolean(Class<?> kind) {
-        return kind.equals(boolean.class) || kind.equals(Boolean.class);
+    default boolean isBoolean(Class<?> reflect) {
+        return reflect.equals(boolean.class) || reflect.equals(Boolean.class);
     }
 
-    default boolean isByte(Class<?> kind) {
-        return kind.equals(byte.class) || kind.equals(Byte.class);
+    default boolean isByte(Class<?> reflect) {
+        return reflect.equals(byte.class) || reflect.equals(Byte.class);
     }
 
-    default boolean isChar(Class<?> kind) {
-        return kind.equals(char.class) || kind.equals(Character.class);
+    default boolean isChar(Class<?> reflect) {
+        return reflect.equals(char.class) || reflect.equals(Character.class);
     }
 
 

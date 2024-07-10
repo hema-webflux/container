@@ -20,14 +20,14 @@ class ContextualBindingBuilder implements Contextual {
     }
 
     @Override
-    public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> data) {
+    public <T> Object resolve(Class<T> reflect, Parameter parameter, Map<String, Object> data) {
 
         if (sourceData == null) {
             sourceData = data;
         }
 
-        if (replacer.hasReplacerAlias(concrete, parameter)) {
-            return getValueForAlias(concrete, parameter, sourceData);
+        if (replacer.hasReplacerAlias(reflect, parameter)) {
+            return getValueForAlias(reflect, parameter, sourceData);
         }
 
         return data.get(guessParameterQueryName(parameter, data));

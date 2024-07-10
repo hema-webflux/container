@@ -22,7 +22,7 @@ class EnumResolver implements Resolver {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource) throws BindingResolutionException {
+    public <T> Object resolve(Class<T> reflect, Parameter parameter, Map<String, Object> datasource) throws BindingResolutionException {
 
         Class<? extends Enum<?>> enumerable = (Class<? extends Enum<?>>) parameter.getType();
 
@@ -32,7 +32,7 @@ class EnumResolver implements Resolver {
             failedBindingResolutionException("The enumeration class [%s] must define members.", enumerable.getName());
         }
 
-        Object value = resolve.resolve(concrete, parameter, datasource);
+        Object value = resolve.resolve(reflect, parameter, datasource);
 
         String constantName = Objects.isNull(value) ? getDefaultEnumValue(enumerable, datasource) : (String) value;
 

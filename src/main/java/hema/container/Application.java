@@ -13,18 +13,18 @@ import java.util.stream.Stream;
 
 class Application implements Container {
 
-    private final ReplacerBindingBuilder aliasable;
+    private final ReplacerBindingBuilder replacer;
 
     private final Function<Parameter, Resolver> builder;
 
     public Application(ReplacerBindingBuilder aliasBinding, Function<Parameter, Resolver> builder) {
-        this.aliasable = aliasBinding;
+        this.replacer = aliasBinding;
         this.builder = builder;
     }
 
     @Override
     public <T> Replacer when(Class<T> concrete) {
-        return aliasable.addConcreteBinding(concrete.getName());
+        return replacer.addConcreteBinding(concrete.getName());
     }
 
     /**

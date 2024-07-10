@@ -14,9 +14,9 @@ class MapResolver implements Resolver {
     }
 
     @Override
-    public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource) throws ResolveException {
+    public <T> Object resolve(Class<T> reflect, Parameter parameter, Map<String, Object> datasource) throws ResolveException {
 
-        Object value = resolver.resolve(concrete, parameter, datasource);
+        Object value = resolver.resolve(reflect, parameter, datasource);
 
         if (value instanceof String && isJsonObject(value)) {
             return new JSONObject((String) value).toMap();

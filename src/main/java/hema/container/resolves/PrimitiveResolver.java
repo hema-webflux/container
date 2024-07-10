@@ -27,9 +27,9 @@ class PrimitiveResolver implements Resolver, Caster<Parameter, String> {
     }
 
     @Override
-    public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource) {
+    public <T> Object resolve(Class<T> reflect, Parameter parameter, Map<String, Object> datasource) {
 
-        Object value = resolver.resolve(concrete, parameter, datasource);
+        Object value = resolver.resolve(reflect, parameter, datasource);
 
         if (Objects.isNull(value)) {
             return getDefaultValue(parameter);

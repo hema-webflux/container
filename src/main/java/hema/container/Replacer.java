@@ -14,20 +14,20 @@ public interface Replacer {
     /**
      * Determines whether replacer are bound to constructor parameters of the given clazz.
      *
-     * @param concrete  Abstract name.
+     * @param reflect  Abstract name.
      * @param parameter Constructor parameter object.
      *
      * @return boolean
      */
-    <T> boolean hasReplacerAlias(Class<T> concrete, Parameter parameter);
+    <T> boolean hasReplacerAlias(Class<T> reflect, Parameter parameter);
 
     /**
      * Get the replacer bound to constructor parameters.
      *
-     * @param concrete  Abstract name.
+     * @param reflect  Abstract name.
      * @param parameter Clazz constructor parameter name.
      *
      * @return Parameter replacer alias.
      */
-    <T> String getReplacerAlias(Class<T> concrete, Parameter parameter);
+    <T> String getReplacerAlias(Class<T> reflect, Parameter parameter);
 }
