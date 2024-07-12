@@ -24,7 +24,6 @@ class ClassResolver implements Resolver {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> Object resolve(Class<T> reflect, Parameter parameter, Map<String, Object> datasource) throws BindingResolutionException {
         if (reflect.isInterface()) {
 
@@ -45,7 +44,9 @@ class ClassResolver implements Resolver {
 
         Object value = resolver.resolve(reflect, parameter, datasource);
 
-        return container.make(parameter.getType(), (Map<String, Object>) value);
+        @SuppressWarnings("unchecked") Map<String, Object> result = (Map<String, Object>) value;
+
+        return container.make(parameter.getType(), result);
     }
 
     /**
