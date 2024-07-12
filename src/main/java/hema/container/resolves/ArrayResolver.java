@@ -18,9 +18,9 @@ class ArrayResolver implements Resolver, Caster<Class<?>, String> {
     }
 
     @Override
-    public <T> Object resolve(Class<T> concrete, Parameter parameter, Map<String, Object> datasource) {
+    public <T> Object resolve(Class<T> reflect, Parameter parameter, Map<String, Object> datasource) {
 
-        Object resolved = resolver.resolve(concrete, parameter, datasource);
+        Object resolved = resolver.resolve(reflect, parameter, datasource);
 
         if (resolved instanceof String) {
 
@@ -29,10 +29,10 @@ class ArrayResolver implements Resolver, Caster<Class<?>, String> {
                 return stringArray.substring(1, stringArray.length() - 1).split(",");
             } else if (!isStringArray((String) resolved) && isSplit((String) resolved)) {
 
-                Class<?> reflect = parameter.getType().getComponentType();
+                Class<?> reflector = parameter.getType().getComponentType();
 
-                if (PrimitiveResolver.isPrimitive(reflect)) {
-                    return createGenericArray(reflect, resolved.toString().split(","), (value) -> castValue(reflect, (String) value));
+                if (PrimitiveResolver.isPrimitive(reflector)) {
+                    return createGenericArray(reflector, resolved.toString().split(","), (value) -> castValue(reflector, (String) value));
                 }
 
                 return resolved.toString().split(",");
